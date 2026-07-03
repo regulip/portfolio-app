@@ -52,9 +52,42 @@ async function loadPortfolioData() {
         if (response.ok) {
             const data = await response.json();
 
-            // HTML tartalom feltöltése az adatokkal
-            document.getElementById('intro-box').innerHTML = `<h3>Bemutatkozás</h3><p>${data.introduction}</p>`;
-            document.getElementById('skills-box').innerHTML = `<h3>Készségek</h3><p>${data.skills.join(', ')}</p>`;
+            // 1. Bemutatkozás betöltése
+            document.getElementById('intro-box').innerHTML = `
+                <h3 style="color: #00ff88;">Rólam</h3>
+                <p style="font-size: 1.1em; color: #b3b3b3;">${data.introduction}</p>
+            `;
+
+            // 2. Készségek listázása
+            let skillsHtml = '<h3 style="color: #00ff88;">Szakmai Készségek</h3><ul>';
+            data.skills.forEach(skill => {
+                skillsHtml += `<li>${skill}</li>`;
+            });
+            skillsHtml += '</ul>';
+            document.getElementById('skills-box').innerHTML = skillsHtml;
+
+            // 3. Tapasztalatok kártyás megjelenítése
+            let expHtml = '<h3 style="color: #00ff88;">Szakmai Tapasztalat</h3>';
+            data.experience.forEach(job => {
+                // A CSS-ben megírt .card dizájnt használjuk
+                expHtml += `
+                    <div class="card">
+                        <h4>${job.role} @ ${job.company}</h4>
+                        <span class="date">${job.date}</span>
+                        <p>${job.desc}</p>
+                    </div>
+                `;
+            });
+
+            // Ellenőrizzük, hogy létezik-e az exp-box, ha nem, létrehozzuk
+            let expBox = document.getElementById('exp-box');
+            if (!expBox) {
+                expBox = document.createElement('section');
+                expBox.id = 'exp-box';
+                document.getElementById('skills-box').after(expBox);
+            }
+            expBox.innerHTML = expHtml;
+
         } else {
             // Ha a token lejárt (20 perc eltelt), automatikus kijelentkeztetés
             alert("A munkamenet lejárt. Kérjük, jelentkezz be újra!");

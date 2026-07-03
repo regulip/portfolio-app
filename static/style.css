@@ -1,0 +1,123 @@
+/* Alapbeállítások és Sötét Mód */
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #ffffff;
+    --text-muted: #b3b3b3;
+    --accent: #00ff88;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Középre igazított konténerek */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Bejelentkező doboz */
+#login-section {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.login-box {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-top: 20px;
+}
+
+input[type="password"] {
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #2d2d2d;
+    color: white;
+    outline: none;
+    margin-right: 10px;
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--accent);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    box-shadow: 0 0 15px var(--accent);
+    transform: scale(1.05);
+}
+
+/* Portfólió Navigáció */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+    z-index: 100;
+}
+
+/* Kártyák (Tapasztalat, Készségek) */
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--accent);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.6s forwards;
+}
+
+.card h4 {
+    margin: 0 0 10px 0;
+    color: var(--accent);
+}
+
+.date {
+    font-size: 0.85em;
+    color: var(--text-muted);
+}
+
+ul {
+    list-style-type: square;
+    color: var(--text-muted);
+}
+
+/* Animáció a görgetéshez */
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* IoT Szekció (Előkészítés) */
+#iot-section {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px dashed #444;
+}
