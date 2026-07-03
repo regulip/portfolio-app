@@ -37,6 +37,42 @@
             <section id="skills-box">
                 <!-- A készségek ide kerülnek -->
             </section>
+
+            <section id="iot-section" class="card" style="border-left-color: #ff0055; margin-top: 40px;">
+                <h3 style="color: #ff0055;">🚀 Húsvéti Tojás: Élő Hardver Integráció</h3>
+                <p>Kipróbálnád a Python és REST API tudásomat a gyakorlatban? Ezzel a panellel valós időben vezérelheted a budapesti nappalim világítását! <i>(Spam védelem aktív: max 3 hívás/perc)</i></p>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+                    <!-- 1. Izzó -->
+                    <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+                        <strong>Olvasólámpa</strong>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-bulb1" onchange="toggleDevice('bulb1', this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- 2. Izzó -->
+                    <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+                        <strong>Hangulatfény</strong>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-bulb2" onchange="toggleDevice('bulb2', this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- 3. Főkapcsoló -->
+                    <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
+                        <strong>Főkapcsoló</strong>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-switch" onchange="toggleDevice('switch', this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <p id="iot-status" style="margin-top: 15px; font-weight: bold; color: #b3b3b3;">Készülékek állapotának lekérdezése...</p>
+            </section>
         </main>
     </div>
 

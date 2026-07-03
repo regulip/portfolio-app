@@ -44,7 +44,7 @@ async function loadPortfolioData() {
     if (!token) return;
 
     try {
-        // GET kérés a védett végpontra, a tokennel a fejlécben (Authorization: Bearer <token>)
+        // GET kérés a védett végpontra, a tokennel a fejlécben
         const response = await fetch('/api/portfolio-data', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -69,7 +69,6 @@ async function loadPortfolioData() {
             // 3. Tapasztalatok kártyás megjelenítése
             let expHtml = '<h3 style="color: #00ff88;">Szakmai Tapasztalat</h3>';
             data.experience.forEach(job => {
-                // A CSS-ben megírt .card dizájnt használjuk
                 expHtml += `
                     <div class="card">
                         <h4>${job.role} @ ${job.company}</h4>
@@ -87,6 +86,9 @@ async function loadPortfolioData() {
                 document.getElementById('skills-box').after(expBox);
             }
             expBox.innerHTML = expHtml;
+
+            // IOT Állapot lekérdezése az adatok betöltése után
+            fetchIotStatus();
 
         } else {
             // Ha a token lejárt (20 perc eltelt), automatikus kijelentkeztetés
@@ -107,4 +109,78 @@ function logout() {
     document.getElementById('password-input').value = '';
     document.getElementById('portfolio-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
+}
+
+// IOT ESZKÖZÖK VEZÉRLÉSE
+// Állapot lekérdezése bejelentkezés után
+async function fetchIotStatus() {
+    const token = sessionStorage.getItem('jwt_token');
+    const statusText = document.getElementById('iot-status');
+
+    try {
+        const response = await fetch('/api/iot/status', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            // Kapcsolók beállítása a valós fizikai állapotra
+            document.getElementById('toggle-bulb1').checked = data.bulb1;
+            document.getElementById('toggle-bulb2').checked = data.bulb2;
+            document.getElementById('toggle-switch').checked = data.switch;
+
+            statusText.innerText = "Rendszer online. Kapcsolat a Tuya felhővel aktív.";
+            statusText.style.color = "#00ff88";
+        } else {
+            statusText.innerText = "Nem sikerült lekérdezni az eszközök állapotát.";
+            statusText.style.color = "#ff4444";
+        }
+    } catch (error) {
+        statusText.innerText = "Hálózati hiba az állapot lekérdezésekor.";
+        statusText.style.color = "#ff4444";
+    }
+}
+
+// Kapcsoló kattintásának kezelése
+async function toggleDevice(device, checkboxElement) {
+    const token = sessionStorage.getItem('jwt_token');
+    const statusText = document.getElementById('iot-status');
+
+    // Határozzuk meg a parancsot a checkbox állapota alapján
+    const action = checkboxElement.checked ? 'on' : 'off';
+
+    // Átmenetileg letiltjuk a gombot, amíg a kérés fut
+    checkboxElement.disabled = true;
+    statusText.style.color = "#ffdd00";
+    statusText.innerText = "Parancs szinkronizálása a felhővel...";
+
+    try {
+        const response = await fetch(`/api/iot/${device}/${action}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            statusText.style.color = "#00ff88";
+            statusText.innerText = "Siker: Eszköz állapota frissítve!";
+        } else {
+            // Ha hiba van (pl. Rate Limit), visszaállítjuk a kapcsolót az eredeti állapotába
+            checkboxElement.checked = !checkboxElement.checked;
+            statusText.style.color = "#ff4444";
+
+            if (response.status === 429) {
+                statusText.innerText = "Védelmi rendszer: Túl sok próbálkozás! Kérlek várj egy percet.";
+            } else {
+                statusText.innerText = "Hiba történt a vezérlés során.";
+            }
+        }
+    } catch (error) {
+        checkboxElement.checked = !checkboxElement.checked;
+        statusText.style.color = "#ff4444";
+        statusText.innerText = "Hálózati hiba történt.";
+    } finally {
+        // Újra engedélyezzük a kattintást
+        checkboxElement.disabled = false;
+    }
 }

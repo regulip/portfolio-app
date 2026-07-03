@@ -6,9 +6,24 @@ from dotenv import load_dotenv
 import jwt
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import requests
+from tuya_connector import TuyaOpenAPI
 
 # --- 1. BEÁLLÍTÁSOK ÉS KÖRNYEZETI VÁLTOZÓK ---
 load_dotenv()
+
+GOVEE_API_KEY = os.getenv("GOVEE_API_KEY")
+GOVEE_DEVICE_MAC = os.getenv("GOVEE_DEVICE_MAC")
+GOVEE_DEVICE_MODEL = os.getenv("GOVEE_DEVICE_MODEL")
+
+TUYA_API_KEY = os.getenv("TUYA_API_KEY")
+TUYA_API_SECRET = os.getenv("TUYA_API_SECRET")
+TUYA_ENDPOINT = "https://openapi.tuyaeu.com"
+
+openapi = None
+if TUYA_API_KEY:
+    openapi = TuyaOpenAPI(TUYA_ENDPOINT, TUYA_API_KEY, TUYA_API_SECRET)
+    openapi.connect()
 
 app = Flask(__name__)
 # Titkos kulcs a JWT tokenek aláírásához (ezt is a .env-ből húzzuk be)
@@ -106,6 +121,63 @@ def get_portfolio_data():
         ]
     }
     return jsonify(portfolio_content)
+
+
+# --- VÉDETT IOT VÉGPONT ---
+@app.route('/api/iot/status', methods=['GET'])
+@token_required
+def get_iot_status():
+    """ Lekérdezi a felhőből a 3 eszköz valós, fizikai állapotát """
+    status_data = {"bulb1": False, "bulb2": False, "switch": False}
+    device_map = {
+        'bulb1': os.getenv("TUYA_BULB_1_ID"),
+        'bulb2': os.getenv("TUYA_BULB_2_ID"),
+        'switch': os.getenv("TUYA_SWITCH_ID")
+    }
+
+    if not openapi:
+        return jsonify(status_data)
+
+    for name, dev_id in device_map.items():
+        if dev_id:
+            try:
+                resp = openapi.get(f"/v1.0/iot-03/devices/{dev_id}/status")
+                if resp.get('success'):
+                    for item in resp.get('result', []):
+                        if item['code'] in ['switch_led', 'switch_1']:
+                            status_data[name] = item['value']
+            except Exception as e:
+                print(f"Hiba {name} lekérésekor: {e}")
+
+    return jsonify(status_data)
+
+@app.route('/api/iot/<device_name>/<action>', methods=['POST'])
+@token_required
+@limiter.limit("3 per minute")
+def control_iot(device_name, action):
+    """ Billenő kapcsoló parancsának végrehajtása """
+    if action not in ['on', 'off']:
+        return jsonify({"status": "error", "message": "Érvénytelen parancs"}), 400
+
+    device_map = {
+        'bulb1': os.getenv("TUYA_BULB_1_ID"),
+        'bulb2': os.getenv("TUYA_BULB_2_ID"),
+        'switch': os.getenv("TUYA_SWITCH_ID")
+    }
+
+    device_id = device_map.get(device_name)
+    if not device_id or not openapi:
+        return jsonify({"status": "error", "message": "Eszköz nem található a .env-ben!"}), 404
+
+    is_on = True if action == 'on' else False
+    command_code = 'switch_led' if 'bulb' in device_name else 'switch_1'
+    commands = {'commands': [{'code': command_code, 'value': is_on}]}
+
+    try:
+        openapi.post(f'/v1.0/iot-03/devices/{device_id}/commands', commands)
+        return jsonify({"status": "success", "device": device_name, "action": action})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
