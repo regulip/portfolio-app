@@ -76,11 +76,17 @@ def init_db():
     conn = get_db_connection()
     if conn:
         c = conn.cursor()
+        # Az eredeti tábla a klímaadatoknak
         c.execute('''CREATE TABLE IF NOT EXISTS readings (
                         id SERIAL PRIMARY KEY,
                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         temperature REAL,
                         humidity REAL
+                    )''')
+        # ÚJ TÁBLA a portfólió adatoknak (JSON formátumban)
+        c.execute('''CREATE TABLE IF NOT EXISTS portfolio_data (
+                        id SERIAL PRIMARY KEY,
+                        content JSON
                     )''')
         conn.commit()
         c.close()
@@ -157,14 +163,26 @@ def login():
 @app.route('/api/portfolio-data', methods=['GET'])
 @token_required
 def get_portfolio_data():
+    """ Ezentúl az adatbázisból kéri le a portfóliót, nem a fájlból! """
     try:
-        with open('portfolio.json', 'r', encoding='utf-8') as file:
-            portfolio_content = json.load(file)
-        return jsonify(portfolio_content)
-    except Exception as e:
-        print(f"Hiba az adatok beolvasásakor: {e}")
-        return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({"message": "Nincs DB kapcsolat"}), 500
 
+        c = conn.cursor(cursor_factory=RealDictCursor)
+        # Lekérjük a legfrissebb mentett önéletrajzot
+        c.execute("SELECT content FROM portfolio_data ORDER BY id DESC LIMIT 1")
+        row = c.fetchone()
+        c.close()
+        conn.close()
+
+        if row and row['content']:
+            return jsonify(row['content'])
+        else:
+            return jsonify({"message": "Nincs adat az adatbázisban!"}), 404
+    except Exception as e:
+        print(f"Hiba az adatok lekérésekor: {e}")
+        return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
 
 @app.route('/api/temperature', methods=['GET'])
 @token_required
