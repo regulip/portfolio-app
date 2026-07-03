@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reguli Patrik - Portfólió</title>
+    <!-- Ide jön majd a CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- 1. BEJELENTKEZŐ KÉPERNYŐ (Kapuőr) -->
+    <div id="login-section" class="container">
+        <h1>Védett Portfólió</h1>
+        <p>Kérlek, add meg a hozzáférési jelszót a tartalom megtekintéséhez.</p>
+
+        <div class="login-box">
+            <input type="password" id="password-input" placeholder="Jelszó...">
+            <button onclick="attemptLogin()">Belépés</button>
+            <p id="login-error" style="color: red; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- 2. PORTFÓLÍÓ TARTALOM (Sikeres belépés után jelenik meg) -->
+    <div id="portfolio-section" class="container" style="display: none;">
+        <nav>
+            <h2>Reguli Patrik</h2>
+            <button onclick="logout()">Kijelentkezés</button>
+        </nav>
+
+        <!-- Ide töltjük be JavaScripttel a szerverről kapott adatokat -->
+        <main>
+            <section id="intro-box">
+                <!-- A bemutatkozás ide kerül -->
+            </section>
+
+            <section id="skills-box">
+                <!-- A készségek ide kerülnek -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Ide jön a JavaScript logika -->
+    <script src="/static/script.js"></script>
+</body>
+</html>
