@@ -8,6 +8,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import requests
 from tuya_connector import TuyaOpenAPI
+import json
 
 # --- 1. BEÁLLÍTÁSOK ÉS KÖRNYEZETI VÁLTOZÓK ---
 load_dotenv()
@@ -104,23 +105,17 @@ def login():
 def get_portfolio_data():
     """
     Védett végpont! A böngésző csak érvényes tokennel kapja meg az adataidat.
+    Mostantól a biztonságos, lokális JSON fájlból olvassa ki az információkat.
     """
-    portfolio_content = {
-        "introduction": "A Gábor Dénes Egyetem mérnökinformatikus hallgatójaként jelenleg az 5. félévemet kezdem. Célom, hogy a tanulmányaim és a saját fejlesztésű projektjeim (Python, IoT) mellett vállalati környezetben is gyakorlati tapasztalatot szerezzek. Korábbi diszpécseri és távközlési munkáim során erős problémamegoldó rutint építettem fel, amelyet most egy IT fókuszú csapatban szeretnék kamatoztatni.",
-        "skills": [
-            "Szoftverfejlesztés: Python, C#, C++",
-            "Webes technológiák & API: Flask, REST API, JavaScript (Fetch API), HTML/CSS",
-            "Architektúra: Git, GitHub, aszinkron és többszálú programozás (Threading)",
-            "Hálózat & Adatbázis: SQLite, CCNA szintű elméleti és gyakorlati ismeretek",
-            "Rendszerüzemeltetés: Hardveres diagnosztika, DDU illesztőprogram-kezelés"
-        ],
-        "experience": [
-            {"role": "Főgyűjtőtisztító", "company": "FCSM", "date": "2026. jún. - Jelenleg", "desc": "Fizikai és infrastrukturális karbantartás, folyamatos munkavégzés az egyetemi tanulmányok mellett."},
-            {"role": "Forgalomirányító diszpécser", "company": "BKV Zrt.", "date": "2026. jan. - 2026. jún.", "desc": "Menetrendi forgalom biztosítása, incidensek higgadt, gyors kezelése."},
-            {"role": "Értékesítő / Tech Support", "company": "Vodafone Partner", "date": "2023. jún. - 2025. nov.", "desc": "Ügyfélproblémák analízise, technikai segítségnyújtás, hardveres diagnosztika."}
-        ]
-    }
-    return jsonify(portfolio_content)
+    try:
+        # Fájl beolvasása (UTF-8 kódolással a magyar ékezetek miatt)
+        with open('portfolio.json', 'r', encoding='utf-8') as file:
+            portfolio_content = json.load(file)
+
+        return jsonify(portfolio_content)
+    except Exception as e:
+        print(f"Hiba az adatok beolvasásakor: {e}")
+        return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
 
 
 # --- VÉDETT IOT VÉGPONT ---
