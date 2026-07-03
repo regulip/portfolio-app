@@ -4,7 +4,6 @@ async function attemptLogin() {
     const errorMsg = document.getElementById('login-error');
 
     try {
-        // POST kérés küldése a Python szervernek
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -14,20 +13,12 @@ async function attemptLogin() {
         const data = await response.json();
 
         if (response.ok) {
-            // SIKER: Token elmentése a böngésző munkamenetébe (bezárásig él)
             sessionStorage.setItem('jwt_token', data.token);
-
-            // UI váltás: Belépő panel elrejtése, Portfólió megjelenítése
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('portfolio-section').style.display = 'block';
-
-            // Hibajelzés eltüntetése
             errorMsg.style.display = 'none';
-
-            // Titkos adatok lekérése a szerverről!
             loadPortfolioData();
         } else {
-            // HIBA (pl. rossz jelszó, vagy Rate Limit tiltás)
             errorMsg.innerText = data.message;
             errorMsg.style.display = 'block';
         }
@@ -39,12 +30,9 @@ async function attemptLogin() {
 // VÉDETT ADATOK LEKÉRÉSE ÉS MEGJELENÍTÉSE
 async function loadPortfolioData() {
     const token = sessionStorage.getItem('jwt_token');
-
-    // Ha nincs token (nem lépett be), nem is próbálkozunk
     if (!token) return;
 
     try {
-        // GET kérés a védett végpontra, a tokennel a fejlécben
         const response = await fetch('/api/portfolio-data', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -52,13 +40,11 @@ async function loadPortfolioData() {
         if (response.ok) {
             const data = await response.json();
 
-            // 1. Bemutatkozás betöltése
             document.getElementById('intro-box').innerHTML = `
                 <h3 style="color: #00ff88;">Rólam</h3>
                 <p style="font-size: 1.1em; color: #b3b3b3;">${data.introduction}</p>
             `;
 
-            // 2. Készségek listázása
             let skillsHtml = '<h3 style="color: #00ff88;">Szakmai Készségek</h3><ul>';
             data.skills.forEach(skill => {
                 skillsHtml += `<li>${skill}</li>`;
@@ -66,7 +52,6 @@ async function loadPortfolioData() {
             skillsHtml += '</ul>';
             document.getElementById('skills-box').innerHTML = skillsHtml;
 
-            // 3. Tapasztalatok kártyás megjelenítése
             let expHtml = '<h3 style="color: #00ff88;">Szakmai Tapasztalat</h3>';
             data.experience.forEach(job => {
                 expHtml += `
@@ -78,7 +63,6 @@ async function loadPortfolioData() {
                 `;
             });
 
-            // Ellenőrizzük, hogy létezik-e az exp-box, ha nem, létrehozzuk
             let expBox = document.getElementById('exp-box');
             if (!expBox) {
                 expBox = document.createElement('section');
@@ -87,11 +71,15 @@ async function loadPortfolioData() {
             }
             expBox.innerHTML = expHtml;
 
-            // IOT Állapot lekérdezése az adatok betöltése után
+            // IOT és Grafikon szinkronizálása (első betöltés)
             fetchIotStatus();
+            fetchAndDrawChart();
+
+            // --- Automatikus frissítés a háttérben ---
+            setInterval(fetchAndDrawChart, 60000);
+            setInterval(fetchIotStatus, 60000);
 
         } else {
-            // Ha a token lejárt (20 perc eltelt), automatikus kijelentkeztetés
             alert("A munkamenet lejárt. Kérjük, jelentkezz be újra!");
             logout();
         }
@@ -102,17 +90,13 @@ async function loadPortfolioData() {
 
 // KIJELENTKEZÉS
 function logout() {
-    // Token törlése a memóriából
     sessionStorage.removeItem('jwt_token');
-
-    // UI visszaállítása az eredeti állapotra
     document.getElementById('password-input').value = '';
     document.getElementById('portfolio-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
 }
 
 // IOT ESZKÖZÖK VEZÉRLÉSE
-// Állapot lekérdezése bejelentkezés után
 async function fetchIotStatus() {
     const token = sessionStorage.getItem('jwt_token');
     const statusText = document.getElementById('iot-status');
@@ -124,8 +108,6 @@ async function fetchIotStatus() {
 
         if (response.ok) {
             const data = await response.json();
-
-            // Kapcsolók beállítása a valós fizikai állapotra
             document.getElementById('toggle-bulb1').checked = data.bulb1;
             document.getElementById('toggle-bulb2').checked = data.bulb2;
             document.getElementById('toggle-switch').checked = data.switch;
@@ -142,15 +124,11 @@ async function fetchIotStatus() {
     }
 }
 
-// Kapcsoló kattintásának kezelése
 async function toggleDevice(device, checkboxElement) {
     const token = sessionStorage.getItem('jwt_token');
     const statusText = document.getElementById('iot-status');
-
-    // Határozzuk meg a parancsot a checkbox állapota alapján
     const action = checkboxElement.checked ? 'on' : 'off';
 
-    // Átmenetileg letiltjuk a gombot, amíg a kérés fut
     checkboxElement.disabled = true;
     statusText.style.color = "#ffdd00";
     statusText.innerText = "Parancs szinkronizálása a felhővel...";
@@ -163,9 +141,22 @@ async function toggleDevice(device, checkboxElement) {
 
         if (response.ok) {
             statusText.style.color = "#00ff88";
-            statusText.innerText = "Siker: Eszköz állapota frissítve!";
+
+            // Csak akkor jelezzük a visszaállást és indítjuk az oldali szinkront, ha felkapcsolták
+            if (action === 'on') {
+                statusText.innerText = `Siker: Eszköz felkapcsolva! (Biztonsági okokból 5 perc múlva automatikusan lekapcsol)`;
+
+                setTimeout(() => {
+                    const currentStatus = document.getElementById('iot-status');
+                    currentStatus.style.color = "#ffdd00";
+                    currentStatus.innerText = "Automatikus lekapcsolás szinkronizálása a felhővel...";
+                    fetchIotStatus();
+                }, 302000); // 5 perc + 2 sec ráhagyás
+            } else {
+                statusText.innerText = `Siker: Eszköz lekapcsolva!`;
+            }
+
         } else {
-            // Ha hiba van (pl. Rate Limit), visszaállítjuk a kapcsolót az eredeti állapotába
             checkboxElement.checked = !checkboxElement.checked;
             statusText.style.color = "#ff4444";
 
@@ -180,7 +171,67 @@ async function toggleDevice(device, checkboxElement) {
         statusText.style.color = "#ff4444";
         statusText.innerText = "Hálózati hiba történt.";
     } finally {
-        // Újra engedélyezzük a kattintást
         checkboxElement.disabled = false;
+    }
+}
+
+// GRAFIKON LOGIKA
+let portfolioChart = null;
+
+async function fetchAndDrawChart() {
+    const token = sessionStorage.getItem('jwt_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch('/api/temperature', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const ctx = document.getElementById('tempChart').getContext('2d');
+
+            if (portfolioChart) {
+                portfolioChart.destroy();
+            }
+
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Hőmérséklet (°C)',
+                            data: data.temperatures,
+                            borderColor: '#ff4444',
+                            backgroundColor: 'rgba(255, 68, 68, 0.2)',
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Páratartalom (%)',
+                            data: data.humidities,
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', grid: {color: '#444'} },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } },
+                        x: { grid: {color: '#444'} }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff' } }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Hiba a grafikon adatainak lekérésekor:", error);
     }
 }

@@ -1,25 +1,26 @@
 import os
 import datetime
+import time
+import threading
 from functools import wraps
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 import jwt
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import requests
 from tuya_connector import TuyaOpenAPI
 import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # --- 1. BEÁLLÍTÁSOK ÉS KÖRNYEZETI VÁLTOZÓK ---
 load_dotenv()
 
-GOVEE_API_KEY = os.getenv("GOVEE_API_KEY")
-GOVEE_DEVICE_MAC = os.getenv("GOVEE_DEVICE_MAC")
-GOVEE_DEVICE_MODEL = os.getenv("GOVEE_DEVICE_MODEL")
-
 TUYA_API_KEY = os.getenv("TUYA_API_KEY")
 TUYA_API_SECRET = os.getenv("TUYA_API_SECRET")
 TUYA_ENDPOINT = "https://openapi.tuyaeu.com"
+TUYA_THERMOMETER_ID = os.getenv("TUYA_THERMOMETER_ID")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 openapi = None
 if TUYA_API_KEY:
@@ -27,68 +28,121 @@ if TUYA_API_KEY:
     openapi.connect()
 
 app = Flask(__name__)
-# Titkos kulcs a JWT tokenek aláírásához (ezt is a .env-ből húzzuk be)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'alap-fejlesztoi-kulcs')
 
-# --- 2. BIZTONSÁG: RATE LIMITER (Spam és Brute-Force védelem) ---
+# Globális szótár az aktív időzítők nyilvántartására
+active_timers = {}
+
+# --- 2. BIZTONSÁG: RATE LIMITER ---
 limiter = Limiter(
     get_remote_address,
     app=app,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"  # Fejlesztés alatt memóriában tároljuk a kérések számát
+    storage_uri="memory://"
 )
 
 
-# --- 3. BIZTONSÁG: JWT TOKEN ELLENŐRZŐ DEKORÁTOR ---
-# Ezt a "címkét" (@token_required) tesszük majd rá azokra a végpontokra,
-# amiket csak sikeres bejelentkezés után szabad elérni (pl. okosotthon vezérlés, portfólió adatok)
+# --- 3. JWT TOKEN ELLENŐRZŐ DEKORÁTOR ---
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
-
         if not token:
             return jsonify({'message': 'A token hiányzik! Pírd be a jelszót.'}), 401
-
         try:
-            # A "Bearer " szó levágása, ha a frontend úgy küldi
             if token.startswith('Bearer '):
                 token = token.split(' ')[1]
-
-            # Token dekódolása és ellenőrzése
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'A munkamenet (token) lejárt! Kérlek, jelentkezz be újra.'}), 401
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Érvénytelen token!'}), 401
-
         return f(*args, **kwargs)
 
     return decorated
 
 
-# --- 4. VÉGPONTOK (API ROUTES) ---
+# --- 4. POSTGRESQL ADATBÁZIS ÉS HÁTTÉR FOLYAMAT ---
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        return conn
+    except Exception as e:
+        print(f"Hiba az adatbázis csatlakozáskor: {e}")
+        return None
 
+
+def init_db():
+    conn = get_db_connection()
+    if conn:
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS readings (
+                        id SERIAL PRIMARY KEY,
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        temperature REAL,
+                        humidity REAL
+                    )''')
+        conn.commit()
+        c.close()
+        conn.close()
+
+
+def background_logger():
+    while True:
+        if openapi and TUYA_THERMOMETER_ID and DATABASE_URL:
+            try:
+                resp = openapi.get(f"/v1.0/iot-03/devices/{TUYA_THERMOMETER_ID}/status")
+                if resp.get('success'):
+                    temp, hum = None, None
+                    for item in resp.get('result', []):
+                        if item['code'] == 'va_temperature':
+                            temp = item['value'] / 10.0
+                        elif item['code'] == 'va_humidity':
+                            hum = item['value']
+
+                    if temp is not None and hum is not None:
+                        conn = get_db_connection()
+                        if conn:
+                            c = conn.cursor()
+
+                            # 1. Az új mérés beillesztése
+                            c.execute("INSERT INTO readings (temperature, humidity) VALUES (%s, %s)", (temp, hum))
+
+                            # 2. Adatbázis takarítás: Csak a legutolsó 30 mérés megtartása
+                            # Ez a parancs töröl minden sort, aminek az azonosítója NINCS benne a legújabb 30-ban
+                            c.execute(
+                                "DELETE FROM readings WHERE id NOT IN (SELECT id FROM readings ORDER BY id DESC LIMIT 30)")
+
+                            conn.commit()
+                            c.close()
+                            conn.close()
+                            print(f"[Log - Postgres] Adat mentve, régi adatok takarítva: {temp}°C, {hum}%")
+            except Exception as e:
+                print(f"[Hiba] A hőmérséklet lekérése/mentése sikertelen: {e}")
+
+        # 15 percenként mér (900 mp)
+        time.sleep(900)
+
+init_db()
+threading.Thread(target=background_logger, daemon=True).start()
+
+
+# --- 5. VÉGPONTOK (API ROUTES) ---
 @app.route('/')
 def index():
-    """ A főoldal kiszolgálása. Ez csak a bejelentkező formot (SPA vázat) tölti be. """
     return render_template('index.html')
 
 
 @app.route('/api/login', methods=['POST'])
-@limiter.limit("5 per minute")  # Maximum 5 próbálkozás percenként egy IP címről!
+@limiter.limit("5 per minute")
 def login():
-    """ Hitelesítési végpont: Itt kapja meg a JS a 20 perces tokent, ha jó a jelszó. """
     data = request.get_json()
-
-    # A helyes jelszót a szerver a .env fájlból olvassa ki (pl. PORTFOLIO_PASSWORD=HireMe2026)
     correct_password = os.getenv('PORTFOLIO_PASSWORD')
 
     if not data or not data.get('password'):
         return jsonify({'message': 'Jelszó megadása kötelező!'}), 400
 
     if data.get('password') == correct_password:
-        # Sikeres belépés: Token generálása pontosan 20 perces lejárattal
         expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=20)
         token = jwt.encode(
             {'user': 'guest_hr', 'exp': expiration_time},
@@ -103,26 +157,73 @@ def login():
 @app.route('/api/portfolio-data', methods=['GET'])
 @token_required
 def get_portfolio_data():
-    """
-    Védett végpont! A böngésző csak érvényes tokennel kapja meg az adataidat.
-    Mostantól a biztonságos, lokális JSON fájlból olvassa ki az információkat.
-    """
     try:
-        # Fájl beolvasása (UTF-8 kódolással a magyar ékezetek miatt)
         with open('portfolio.json', 'r', encoding='utf-8') as file:
             portfolio_content = json.load(file)
-
         return jsonify(portfolio_content)
     except Exception as e:
         print(f"Hiba az adatok beolvasásakor: {e}")
         return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
 
 
-# --- VÉDETT IOT VÉGPONT ---
+@app.route('/api/temperature', methods=['GET'])
+@token_required
+def get_temperature_data():
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({"status": "error", "message": "Nincs DB kapcsolat"}), 500
+
+        c = conn.cursor(cursor_factory=RealDictCursor)
+        c.execute("SELECT timestamp, temperature, humidity FROM readings ORDER BY id DESC LIMIT 20")
+        rows = c.fetchall()
+        c.close()
+        conn.close()
+
+        rows.reverse()
+
+        data = {
+            "labels": [row['timestamp'].strftime('%H:%M') for row in rows],
+            "temperatures": [row['temperature'] for row in rows],
+            "humidities": [row['humidity'] for row in rows]
+        }
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+def revert_iot_state(device_name, revert_action):
+    global active_timers
+    if not openapi:
+        return
+
+    device_map = {
+        'bulb1': os.getenv("TUYA_BULB_1_ID"),
+        'bulb2': os.getenv("TUYA_BULB_2_ID"),
+        'switch': os.getenv("TUYA_SWITCH_ID")
+    }
+
+    device_id = device_map.get(device_name)
+    if not device_id:
+        return
+
+    is_on = True if revert_action == 'on' else False
+    command_code = 'switch_led' if 'bulb' in device_name else 'switch_1'
+    commands = {'commands': [{'code': command_code, 'value': is_on}]}
+
+    try:
+        openapi.post(f'/v1.0/iot-03/devices/{device_id}/commands', commands)
+        print(f"[Auto-Revert] {device_name} sikeresen visszaállítva erre: {revert_action}")
+        # Töröljük a lefutott stoppert a szótárból
+        if device_name in active_timers:
+            del active_timers[device_name]
+    except Exception as e:
+        print(f"[Hiba az Auto-Revert során]: {e}")
+
+
 @app.route('/api/iot/status', methods=['GET'])
 @token_required
 def get_iot_status():
-    """ Lekérdezi a felhőből a 3 eszköz valós, fizikai állapotát """
     status_data = {"bulb1": False, "bulb2": False, "switch": False}
     device_map = {
         'bulb1': os.getenv("TUYA_BULB_1_ID"),
@@ -146,11 +247,13 @@ def get_iot_status():
 
     return jsonify(status_data)
 
+
 @app.route('/api/iot/<device_name>/<action>', methods=['POST'])
 @token_required
 @limiter.limit("3 per minute")
 def control_iot(device_name, action):
-    """ Billenő kapcsoló parancsának végrehajtása """
+    global active_timers
+
     if action not in ['on', 'off']:
         return jsonify({"status": "error", "message": "Érvénytelen parancs"}), 400
 
@@ -169,10 +272,24 @@ def control_iot(device_name, action):
     commands = {'commands': [{'code': command_code, 'value': is_on}]}
 
     try:
+        # 1. Eredeti parancs végrehajtása
         openapi.post(f'/v1.0/iot-03/devices/{device_id}/commands', commands)
+
+        # 2. Ha volt már folyamatban lévő időzítő ehhez a lámpához, azonnal leállítjuk!
+        if device_name in active_timers:
+            active_timers[device_name].cancel()
+
+        # 3. CSAK akkor indítunk 5 perces KIKAPCSOLÓ biztonsági stoppert, ha FELKAPCSOLTÁK a lámpát
+        if action == 'on':
+            timer = threading.Timer(300.0, revert_iot_state, args=[device_name, 'off'])
+            timer.daemon = True
+            timer.start()
+            active_timers[device_name] = timer
+
         return jsonify({"status": "success", "device": device_name, "action": action})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

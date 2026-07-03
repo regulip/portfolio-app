@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reguli Patrik - Portfólió</title>
-    <!-- Ide jön majd a CSS -->
     <link rel="stylesheet" href="/static/style.css">
+    <!-- Chart.js beolvasása a grafikonhoz -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- 1. BEJELENTKEZŐ KÉPERNYŐ (Kapuőr) -->
+    <!-- 1. BEJELENTKEZŐ KÉPERNYŐ -->
     <div id="login-section" class="container">
         <h1>Védett Portfólió</h1>
         <p>Kérlek, add meg a hozzáférési jelszót a tartalom megtekintéséhez.</p>
@@ -21,14 +22,13 @@
         </div>
     </div>
 
-    <!-- 2. PORTFÓLÍÓ TARTALOM (Sikeres belépés után jelenik meg) -->
+    <!-- 2. PORTFÓLÍÓ TARTALOM -->
     <div id="portfolio-section" class="container" style="display: none;">
         <nav>
             <h2>Reguli Patrik</h2>
             <button onclick="logout()">Kijelentkezés</button>
         </nav>
 
-        <!-- Ide töltjük be JavaScripttel a szerverről kapott adatokat -->
         <main>
             <section id="intro-box">
                 <!-- A bemutatkozás ide kerül -->
@@ -43,7 +43,6 @@
                 <p>Kipróbálnád a Python és REST API tudásomat a gyakorlatban? Ezzel a panellel valós időben vezérelheted a budapesti nappalim világítását! <i>(Spam védelem aktív: max 3 hívás/perc)</i></p>
 
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
-                    <!-- 1. Izzó -->
                     <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Olvasólámpa</strong>
                         <label class="switch">
@@ -52,7 +51,6 @@
                         </label>
                     </div>
 
-                    <!-- 2. Izzó -->
                     <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Hangulatfény</strong>
                         <label class="switch">
@@ -61,7 +59,6 @@
                         </label>
                     </div>
 
-                    <!-- 3. Főkapcsoló -->
                     <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; flex: 1; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Főkapcsoló</strong>
                         <label class="switch">
@@ -71,12 +68,17 @@
                     </div>
                 </div>
 
+                <!-- IDE JÖTT BE A GRAFIKON -->
+                <div style="margin-top: 30px; background: #2d2d2d; padding: 15px; border-radius: 8px;">
+                    <strong>Szoba Klímája (Élő adatok az adatbázisból)</strong>
+                    <canvas id="tempChart" width="400" height="150" style="margin-top: 15px;"></canvas>
+                </div>
+
                 <p id="iot-status" style="margin-top: 15px; font-weight: bold; color: #b3b3b3;">Készülékek állapotának lekérdezése...</p>
             </section>
         </main>
     </div>
 
-    <!-- Ide jön a JavaScript logika -->
     <script src="/static/script.js"></script>
 </body>
-</html>
+</html>l>
