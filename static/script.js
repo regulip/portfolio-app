@@ -144,14 +144,14 @@ async function toggleDevice(device, checkboxElement) {
 
             // Csak akkor jelezzük a visszaállást és indítjuk az oldali szinkront, ha felkapcsolták
             if (action === 'on') {
-                statusText.innerText = `Siker: Eszköz felkapcsolva! (Biztonsági okokból 5 perc múlva automatikusan lekapcsol)`;
+                statusText.innerText = `Siker: Eszköz felkapcsolva! (Biztonsági okokból 2 perc múlva automatikusan lekapcsol)`;
 
                 setTimeout(() => {
                     const currentStatus = document.getElementById('iot-status');
                     currentStatus.style.color = "#ffdd00";
                     currentStatus.innerText = "Automatikus lekapcsolás szinkronizálása a felhővel...";
                     fetchIotStatus();
-                }, 302000); // 5 perc + 2 sec ráhagyás
+                }, 122000); // 2 perc (120000 ms) + 2 sec ráhagyás
             } else {
                 statusText.innerText = `Siker: Eszköz lekapcsolva!`;
             }
@@ -171,7 +171,10 @@ async function toggleDevice(device, checkboxElement) {
         statusText.style.color = "#ff4444";
         statusText.innerText = "Hálózati hiba történt.";
     } finally {
-        checkboxElement.disabled = false;
+        // 1.5 másodperces (1500 ms) kötelező pihenő a gomb újraengedélyezése előtt
+        setTimeout(() => {
+            checkboxElement.disabled = false;
+        }, 1500);
     }
 }
 

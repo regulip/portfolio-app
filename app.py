@@ -299,7 +299,7 @@ def control_iot(device_name, action):
 
         # 3. CSAK akkor indítunk 5 perces KIKAPCSOLÓ biztonsági stoppert, ha FELKAPCSOLTÁK a lámpát
         if action == 'on':
-            timer = threading.Timer(300.0, revert_iot_state, args=[device_name, 'off'])
+            timer = threading.Timer(120.0, revert_iot_state, args=[device_name, 'off'])
             timer.daemon = True
             timer.start()
             active_timers[device_name] = timer
