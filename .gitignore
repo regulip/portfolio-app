@@ -1,2 +1,5 @@
 .env
 portfolio.json
+venv/
+.idea/
+__pycache__/
