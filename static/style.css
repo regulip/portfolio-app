@@ -172,8 +172,8 @@ input:disabled + .slider {
     cursor: not-allowed;
 }
 
-/* Grafikon mobilos nézetének javítása */
+/* Grafikon mobilos nézetének javítása és növekedés blokkolása */
 #tempChart {
-    min-height: 300px !important;
+    max-height: 350px !important;
     width: 100% !important;
 }
