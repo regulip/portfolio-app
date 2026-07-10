@@ -12,7 +12,7 @@ from tuya_connector import TuyaOpenAPI
 import json
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
+from zoneinfo import ZoneInfo
 # --- 1. BEÁLLÍTÁSOK ÉS KÖRNYEZETI VÁLTOZÓK ---
 load_dotenv()
 
@@ -201,7 +201,9 @@ def get_temperature_data():
         rows.reverse()
 
         data = {
-            "labels": [row['timestamp'].strftime('%H:%M') for row in rows],
+            "labels": [
+                row['timestamp'].replace(tzinfo=datetime.timezone.utc).astimezone(ZoneInfo("Europe/Budapest")).strftime(
+                    '%H:%M') for row in rows],
             "temperatures": [row['temperature'] for row in rows],
             "humidities": [row['humidity'] for row in rows]
         }
