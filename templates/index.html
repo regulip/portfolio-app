@@ -68,10 +68,19 @@
                     </div>
                 </div>
 
-                <!-- IDE JÖTT BE A GRAFIKON -->
+                <!-- GRAFIKON -->
                 <div style="margin-top: 30px; background: #2d2d2d; padding: 15px; border-radius: 8px;">
-                    <strong>Szoba Klímája (Élő adatok az adatbázisból)</strong>
-                    <canvas id="tempChart" width="400" height="150" style="margin-top: 15px;"></canvas>
+                    <strong>Szoba Klímája - Hőmérséklet</strong>
+                    <div style="position: relative; height: 200px; width: 100%; margin-top: 15px;">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; background: #2d2d2d; padding: 15px; border-radius: 8px;">
+                    <strong>Szoba Klímája - Páratartalom</strong>
+                    <div style="position: relative; height: 200px; width: 100%; margin-top: 15px;">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
                 </div>
 
                 <p id="iot-status" style="margin-top: 15px; font-weight: bold; color: #b3b3b3;">Készülékek állapotának lekérdezése...</p>

@@ -227,7 +227,8 @@ function triggerLockout(lastClickedCheckbox) {
 }
 
 // GRAFIKON LOGIKA
-let portfolioChart = null;
+let tempChart = null;
+let humidityChart = null;
 
 async function fetchAndDrawChart() {
     const token = sessionStorage.getItem('jwt_token');
@@ -240,50 +241,66 @@ async function fetchAndDrawChart() {
 
         if (response.ok) {
             const data = await response.json();
-            const ctx = document.getElementById('tempChart').getContext('2d');
 
-            // Ha már létezik a grafikon, csak feltöltjük az új adatokkal (nincs ugrálás!)
-            if (portfolioChart) {
-                portfolioChart.data.labels = data.labels;
-                portfolioChart.data.datasets[0].data = data.temperatures;
-                portfolioChart.data.datasets[1].data = data.humidities;
-                portfolioChart.update();
+            const ctxTemp = document.getElementById('tempChart').getContext('2d');
+            const ctxHum = document.getElementById('humidityChart').getContext('2d');
+
+            // --- 1. HŐMÉRSÉKLET GRAFIKON ---
+            if (tempChart) {
+                tempChart.data.labels = data.labels;
+                tempChart.data.datasets[0].data = data.temperatures;
+                tempChart.update();
             } else {
-                // Ha még nincs grafikon, megrajzoljuk
-                portfolioChart = new Chart(ctx, {
+                tempChart = new Chart(ctxTemp, {
                     type: 'line',
                     data: {
                         labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'Hőmérséklet (°C)',
-                                data: data.temperatures,
-                                borderColor: '#ff4444',
-                                backgroundColor: 'rgba(255, 68, 68, 0.2)',
-                                tension: 0.4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Páratartalom (%)',
-                                data: data.humidities,
-                                borderColor: '#00ff88',
-                                backgroundColor: 'rgba(0, 255, 136, 0.2)',
-                                tension: 0.4,
-                                yAxisID: 'y1'
-                            }
-                        ]
+                        datasets: [{
+                            label: 'Hőmérséklet (°C)',
+                            data: data.temperatures,
+                            borderColor: '#ff4444', // Pirosas
+                            backgroundColor: 'rgba(255, 68, 68, 0.2)',
+                            tension: 0.4
+                        }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false, // <-- EZ A TITOK a szép mobilos nézethez!
+                        maintainAspectRatio: false,
                         scales: {
-                            y: { type: 'linear', display: true, position: 'left', grid: {color: '#444'} },
-                            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } },
-                            x: { grid: {color: '#444'} }
+                            y: { grid: { color: '#444' } },
+                            x: { grid: { color: '#444' } }
                         },
-                        plugins: {
-                            legend: { labels: { color: '#fff' } }
-                        }
+                        plugins: { legend: { labels: { color: '#fff' } } }
+                    }
+                });
+            }
+
+            // --- 2. PÁRATARTALOM GRAFIKON ---
+            if (humidityChart) {
+                humidityChart.data.labels = data.labels;
+                humidityChart.data.datasets[0].data = data.humidities;
+                humidityChart.update();
+            } else {
+                humidityChart = new Chart(ctxHum, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Páratartalom (%)',
+                            data: data.humidities,
+                            borderColor: '#00ff88', // Zöldes
+                            backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { grid: { color: '#444' } },
+                            x: { grid: { color: '#444' } }
+                        },
+                        plugins: { legend: { labels: { color: '#fff' } } }
                     }
                 });
             }
