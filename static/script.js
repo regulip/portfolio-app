@@ -97,6 +97,8 @@ function logout() {
 }
 
 // IOT ESZKÖZÖK VEZÉRLÉSE
+let turnOnCount = 0;
+let isLockedOut = false;
 async function fetchIotStatus() {
     const token = sessionStorage.getItem('jwt_token');
     const statusText = document.getElementById('iot-status');
@@ -125,9 +127,23 @@ async function fetchIotStatus() {
 }
 
 async function toggleDevice(device, checkboxElement) {
+    if (isLockedOut) {
+        checkboxElement.checked = !checkboxElement.checked; // Visszabillentjük, ha tiltva próbálja nyomni
+        return;
+    }
+
     const token = sessionStorage.getItem('jwt_token');
     const statusText = document.getElementById('iot-status');
     const action = checkboxElement.checked ? 'on' : 'off';
+
+    // SZÁMLÁLÓ LOGIKA: Csak a felkapcsolásokat számoljuk
+    if (action === 'on') {
+        turnOnCount++;
+        if (turnOnCount >= 4) {
+            triggerLockout(checkboxElement);
+            return; // Megállítjuk a kódot, el sem küldjük a szervernek!
+        }
+    }
 
     checkboxElement.disabled = true;
     statusText.style.color = "#ffdd00";
@@ -142,16 +158,17 @@ async function toggleDevice(device, checkboxElement) {
         if (response.ok) {
             statusText.style.color = "#00ff88";
 
-            // Csak akkor jelezzük a visszaállást és indítjuk az oldali szinkront, ha felkapcsolták
             if (action === 'on') {
                 statusText.innerText = `Siker: Eszköz felkapcsolva! (Biztonsági okokból 2 perc múlva automatikusan lekapcsol)`;
 
                 setTimeout(() => {
                     const currentStatus = document.getElementById('iot-status');
-                    currentStatus.style.color = "#ffdd00";
-                    currentStatus.innerText = "Automatikus lekapcsolás szinkronizálása a felhővel...";
+                    if (!isLockedOut) { // Csak akkor írjuk át a szöveget, ha épp nincs piros tiltás alatt
+                        currentStatus.style.color = "#ffdd00";
+                        currentStatus.innerText = "Automatikus lekapcsolás szinkronizálása a felhővel...";
+                    }
                     fetchIotStatus();
-                }, 122000); // 2 perc (120000 ms) + 2 sec ráhagyás
+                }, 122000);
             } else {
                 statusText.innerText = `Siker: Eszköz lekapcsolva!`;
             }
@@ -161,7 +178,7 @@ async function toggleDevice(device, checkboxElement) {
             statusText.style.color = "#ff4444";
 
             if (response.status === 429) {
-                statusText.innerText = "Védelmi rendszer: Túl sok próbálkozás! Kérlek várj egy percet.";
+                statusText.innerText = "Védelmi rendszer: Túl sok gyors kattintás! Kérlek, várj egy picit.";
             } else {
                 statusText.innerText = "Hiba történt a vezérlés során.";
             }
@@ -171,11 +188,42 @@ async function toggleDevice(device, checkboxElement) {
         statusText.style.color = "#ff4444";
         statusText.innerText = "Hálózati hiba történt.";
     } finally {
-        // 1.5 másodperces (1500 ms) kötelező pihenő a gomb újraengedélyezése előtt
         setTimeout(() => {
-            checkboxElement.disabled = false;
+            // Csak akkor engedjük újra nyomkodni, ha nem lépett érvénybe a nagy 5 perces tiltás
+            if (!isLockedOut) {
+                checkboxElement.disabled = false;
+            }
         }, 1500);
     }
+}
+
+// 5 PERCES TILTÓ LOGIKA
+function triggerLockout(lastClickedCheckbox) {
+    isLockedOut = true;
+    lastClickedCheckbox.checked = false; // A 4. kattintást fizikailag visszavonjuk
+
+    const statusText = document.getElementById('iot-status');
+
+    // Mindhárom gombot kiszürkítjük
+    document.getElementById('toggle-bulb1').disabled = true;
+    document.getElementById('toggle-bulb2').disabled = true;
+    document.getElementById('toggle-switch').disabled = true;
+
+    statusText.style.color = "#ff4444";
+    statusText.innerText = "Védelmi Rendszer: Elérted a limitet! A gombok 5 percre letiltva.";
+
+    // 5 perc (300,000 ms) múlva minden visszaáll a normális kerékvágásba
+    setTimeout(() => {
+        isLockedOut = false;
+        turnOnCount = 0; // Nullázzuk a számlálót
+
+        document.getElementById('toggle-bulb1').disabled = false;
+        document.getElementById('toggle-bulb2').disabled = false;
+        document.getElementById('toggle-switch').disabled = false;
+
+        statusText.style.color = "#00ff88";
+        statusText.innerText = "Zár feloldva. A kapcsolók újra használhatók.";
+    }, 300000);
 }
 
 // GRAFIKON LOGIKA
