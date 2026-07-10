@@ -268,7 +268,7 @@ def get_iot_status():
 
 @app.route('/api/iot/<device_name>/<action>', methods=['POST'])
 @token_required
-@limiter.limit("3 per minute")
+@limiter.limit("3 per minute", exempt_when=lambda: request.view_args.get('action') == 'off')
 def control_iot(device_name, action):
     global active_timers
 

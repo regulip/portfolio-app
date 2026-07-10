@@ -191,45 +191,51 @@ async function fetchAndDrawChart() {
             const data = await response.json();
             const ctx = document.getElementById('tempChart').getContext('2d');
 
+            // Ha már létezik a grafikon, csak feltöltjük az új adatokkal (nincs ugrálás!)
             if (portfolioChart) {
-                portfolioChart.destroy();
-            }
-
-            portfolioChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Hőmérséklet (°C)',
-                            data: data.temperatures,
-                            borderColor: '#ff4444',
-                            backgroundColor: 'rgba(255, 68, 68, 0.2)',
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Páratartalom (%)',
-                            data: data.humidities,
-                            borderColor: '#00ff88',
-                            backgroundColor: 'rgba(0, 255, 136, 0.2)',
-                            tension: 0.4,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { type: 'linear', display: true, position: 'left', grid: {color: '#444'} },
-                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } },
-                        x: { grid: {color: '#444'} }
+                portfolioChart.data.labels = data.labels;
+                portfolioChart.data.datasets[0].data = data.temperatures;
+                portfolioChart.data.datasets[1].data = data.humidities;
+                portfolioChart.update();
+            } else {
+                // Ha még nincs grafikon, megrajzoljuk
+                portfolioChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Hőmérséklet (°C)',
+                                data: data.temperatures,
+                                borderColor: '#ff4444',
+                                backgroundColor: 'rgba(255, 68, 68, 0.2)',
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Páratartalom (%)',
+                                data: data.humidities,
+                                borderColor: '#00ff88',
+                                backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                                tension: 0.4,
+                                yAxisID: 'y1'
+                            }
+                        ]
                     },
-                    plugins: {
-                        legend: { labels: { color: '#fff' } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // <-- EZ A TITOK a szép mobilos nézethez!
+                        scales: {
+                            y: { type: 'linear', display: true, position: 'left', grid: {color: '#444'} },
+                            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } },
+                            x: { grid: {color: '#444'} }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#fff' } }
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     } catch (error) {
         console.error("Hiba a grafikon adatainak lekérésekor:", error);
