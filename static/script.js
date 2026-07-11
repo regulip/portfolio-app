@@ -83,36 +83,36 @@ async function fetchPersonalData() {
         if (response.ok) {
             const data = await response.json();
 
-            // 1. RÓLAM szekció feltöltése
+            // 1. BEMUTATKOZÁS szekció feltöltése
             const aboutCard = document.getElementById('about-me');
             aboutCard.innerHTML = `
-                <h2 style="text-align: center; color: var(--accent); margin-bottom: 20px;">Rólam</h2>
+                <h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; text-align: center;">Bemutatkozás</h2>
                 <p style="line-height: 1.8; font-size: 1.1rem; text-align: justify; color: var(--text-main);">
                     ${data.personal_info.introduction}
                 </p>
             `;
 
             // 2. SULI szekció feltöltése (Listázás)
-            let eduHTML = `<h2 style="color: var(--accent); margin-bottom: 15px;">SULI</h2>`;
+            let eduHTML = `<h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem;">Tanulmányaim</h2>`;
             data.education.forEach(edu => {
                 eduHTML += `
-                    <div style="margin-bottom: 15px;">
-                        <h3 style="margin-bottom: 5px; color: var(--text-main); font-size: 1.1rem;">${edu.institution}</h3>
-                        <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">${edu.degree}</p>
-                        <p style="color: var(--accent); margin: 0; font-size: 0.8rem;">${edu.period}</p>
+                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(255, 140, 0, 0.4);">
+                        <h3 style="margin: 0 0 5px 0; color: var(--text-main); font-size: 1.15rem; font-weight: 700;">${edu.institution}</h3>
+                        <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.4;">${edu.degree}</p>
+                        <p style="color: var(--accent); margin: 0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">${edu.period}</p>
                     </div>
                 `;
             });
             document.getElementById('education').innerHTML = eduHTML;
 
             // 3. MUNKA szekció feltöltése (Listázás)
-            let expHTML = `<h2 style="color: var(--accent); margin-bottom: 15px;">MUNKA</h2>`;
+            let expHTML = `<h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem;">Munkatapasztalataim</h2>`;
             data.experience.forEach(job => {
                 expHTML += `
-                    <div style="margin-bottom: 15px;">
-                        <h3 style="margin-bottom: 5px; color: var(--text-main); font-size: 1.1rem;">${job.company}</h3>
-                        <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">${job.role}</p>
-                        <p style="color: var(--accent); margin: 0; font-size: 0.8rem;">${job.period}</p>
+                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(255, 140, 0, 0.4);">
+                        <h3 style="margin: 0 0 5px 0; color: var(--text-main); font-size: 1.15rem; font-weight: 700;">${job.company}</h3>
+                        <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.4;">${job.role}</p>
+                        <p style="color: var(--accent); margin: 0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">${job.period}</p>
                     </div>
                 `;
             });
@@ -126,43 +126,99 @@ async function fetchPersonalData() {
             ];
 
             let skillsHTML = `
-                <h2 style="color: var(--accent); margin-bottom: 20px;">KÉSZSÉG, BIZONYÍTVÁNY & HOBBI</h2>
+                <h2 style="margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; text-align: center;">
+                    <span style="color: #ff4444;">Tanfolyamok</span>,
+                    <span style="color: var(--accent);">készségek</span> &
+                    <span style="color: #4da6ff;">hobbik</span>
+                </h2>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
             `;
 
-            allSkillsAndHobbies.forEach(item => {
-                skillsHTML += generateSkillBadge(item);
-            });
+            if(data.certifications) {
+                data.certifications.forEach(item => skillsHTML += generateSkillBadge(item, 'cert'));
+            }
+            if(data.skills) {
+                data.skills.forEach(item => skillsHTML += generateSkillBadge(item, 'skill'));
+            }
+            if(data.hobbies) {
+                data.hobbies.forEach(item => skillsHTML += generateSkillBadge(item, 'hobby'));
+            }
 
             skillsHTML += `</div>`;
             document.getElementById('skills').innerHTML = skillsHTML;
 
-            // 5. LÁBLÉC SZEKCIÓ FELTÖLTÉSE A DB ADATOKKAL (Most már jó helyen, az if blokkon belül!)
+            // 5. LÁBLÉC SZEKCIÓ FELTÖLTÉSE A DB ADATOKKAL
             const footerCard = document.getElementById('dynamic-footer');
             if (footerCard && data.personal_info) {
                 footerCard.innerHTML = `
                     <h3 style="color: var(--accent); margin-top: 0; margin-bottom: 25px; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase;">Kapcsolat</h3>
-
                     <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 30px; font-size: 1rem; color: var(--text-muted);">
                         <span style="margin: 0;">📍 ${data.personal_info.location || 'Nincs megadva cím'}</span>
                         <span style="margin: 0;">📧 ${data.personal_info.email || 'Nincs megadva e-mail'}</span>
                         <span style="margin: 0;">📞 ${data.personal_info.phone || 'Nincs megadva telefon'}</span>
                     </div>
-
                     <p style="margin-top: 40px; margin-bottom: 0; color: #666; font-size: 0.85rem;">© ${new Date().getFullYear()} Reguli Patrik. Minden jog fenntartva.</p>
                 `;
             }
 
-        } // <--- IDE KERÜLT ÁT A ZÁRÓJEL, ÍGY MINDEN A HELYÉN VAN
+            // 6. PROFILKÉP BETÖLTÉSE "GUMIS" ANIMÁCIÓVAL (Most már jó helyen, a try-ban, a data változóval!)
+            const profilePicContainer = document.getElementById('dynamic-profile-pic');
+            if (profilePicContainer && data.personal_info && data.personal_info.profile_image) {
+                profilePicContainer.innerHTML = `
+                    <style>
+                        .morphing-blob-pic {
+                            width: 260px;
+                            height: 260px;
+                            background-size: cover;
+                            background-position: center;
+                            border: 3px solid var(--accent);
+                            box-shadow: 0 0 25px rgba(255, 140, 0, 0.3);
+                            animation: profileMorph 8s ease-in-out infinite;
+                            transition: all 0.5s ease;
+                        }
+                        .morphing-blob-pic:hover {
+                            transform: scale(1.05);
+                            box-shadow: 0 0 35px rgba(255, 140, 0, 0.5);
+                        }
+                        @keyframes profileMorph {
+                            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+                            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+                            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+                        }
+                    </style>
+                    <div id="blob-image-target" class="morphing-blob-pic"></div>
+                `;
+
+                const imgTarget = document.getElementById('blob-image-target');
+                if (imgTarget) {
+                    imgTarget.style.backgroundImage = `url('${data.personal_info.profile_image}')`;
+                }
+            }
+
+        }
 
     } catch (error) {
         console.error('Hálózat/API hiba az adatok betöltésekor:', error);
     }
 }
 
-// Segédfüggvény a szép "kapszula" stílusú gombokhoz
-function generateSkillBadge(skillName) {
-    return `<span style="background: rgba(255, 140, 0, 0.15); padding: 8px 18px; border-radius: 20px; border: 1px solid var(--accent); font-weight: bold; color: var(--text-main); font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">${skillName}</span>`;
+// Segédfüggvény a szép "kapszula" stílusú gombokhoz (Színkódolt verzió)
+function generateSkillBadge(skillName, type) {
+    let bgColor, borderColor;
+
+    // Színek meghatározása a típus alapján
+    if (type === 'skill') {
+        bgColor = 'rgba(255, 140, 0, 0.15)'; // Narancs
+        borderColor = 'var(--accent)';
+    } else if (type === 'cert') {
+        bgColor = 'rgba(255, 68, 68, 0.15)'; // Piros
+        borderColor = '#ff4444';
+    } else if (type === 'hobby') {
+        bgColor = 'rgba(77, 166, 255, 0.15)'; // Kék
+        borderColor = '#4da6ff';
+    }
+
+    return `<span style="background: ${bgColor}; padding: 8px 18px; border-radius: 20px; border: 1px solid ${borderColor}; font-weight: bold; color: var(--text-main); font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${skillName}</span>`;
 }
 
 // --- 2. MODUL: GITHUB ÉS EGYÉB PROJEKTEK BETÖLTÉSE (Dupla Vízszintes Slider) ---
@@ -200,9 +256,9 @@ async function fetchGitHubProjects() {
             repos.slice(0, 6).forEach(repo => {
                 html += `
                     <a href="${repo.html_url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 260px;">
-                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
+                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
                              onmouseover="this.style.background='rgba(255, 140, 0, 0.1)'; this.style.transform='translateY(-10px)';"
-                             onmouseout="this.style.background='rgba(255, 255, 255, 0.03)'; this.style.transform='translateY(0)';">
+                             onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
                             <div>
                                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${repo.name}</h3>
@@ -272,9 +328,9 @@ async function fetchGitHubProjects() {
             otherProjects.forEach(proj => {
                 html += `
                     <a href="${proj.url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 260px;">
-                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
+                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
                              onmouseover="this.style.background='rgba(255, 140, 0, 0.1)'; this.style.transform='translateY(-10px)';"
-                             onmouseout="this.style.background='rgba(255, 255, 255, 0.03)'; this.style.transform='translateY(0)';">
+                             onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
                             <div>
                                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
@@ -311,7 +367,7 @@ async function fetchGitHubProjects() {
 }
 
 
-// --- 3. MODUL: IOT ÉS OKOSOTTHON INTEGRÁCIÓ (V2 Dizájn + V1 Logika) ---
+// --- 3. MODUL: IOT ÉS OKOSOTTHON INTEGRÁCIÓ ---
 let turnOnCount = 0;
 let isLockedOut = false;
 let tempChartInstance = null;
@@ -321,58 +377,38 @@ async function initIoTModule() {
     const iotCard = document.getElementById('iot-dashboard');
     if (!iotCard) return;
 
-    // A V2 HTML/CSS Layout marad változatlan
     iotCard.innerHTML = `
         <style>
-            /* 1. FŐ ELRENDEZÉS: Itt vettük le a méretet 90%-ra és igazítottuk középre */
-            .iot-main-layout {
-                display: grid;
-                grid-template-columns: 1fr 1.5fr;
-                gap: 15px;
-                width: 95%; /* 100% helyett 90% */
-                max-width: 1200px; /* Nem engedjük túlnyúlni nagy képernyőkön */
-                margin: 0 auto 15px auto; /* A "0 auto" felel a tökéletes középre igazításért */
-            }
+    .iot-main-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; width: 95%; max-width: 1200px; margin: 0 auto 15px auto; }
+    .iot-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+    .iot-charts-col { display: flex; flex-direction: column; gap: 10px; }
 
-            /* BAL OLDAL: 2x2-es Rács */
-            .iot-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+    /* A diagram doboza marad az eredeti sötét szín: rgba(0, 0, 0, 0.15) */
+    .chart-box { flex: 1; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); border-radius: 15px; padding: 10px; position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 120px; }
 
-            /* JOBB OLDAL: Grafikonok */
-            .iot-charts-col { display: flex; flex-direction: column; gap: 10px; }
-            .chart-box { flex: 1; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); border-radius: 15px; padding: 10px; position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 120px; }
+    /* A gombok (grid-cell) is megkapták UGYANAZT a sötétebb színt, mint a diagramok! */
+    .grid-cell { background: rgba(0, 0, 0, 0.15); border: 2px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(5px); transition: all 0.3s ease; aspect-ratio: 1; }
 
-            /* CELLÁK STÍLUSA */
-            .grid-cell { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(5px); transition: all 0.3s ease; aspect-ratio: 1; }
+    .iot-btn { cursor: pointer; color: var(--text-main); font-weight: bold; user-select: none; }
+    .iot-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.02); }
+    .iot-btn.on { background: rgba(255, 140, 0, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(255, 140, 0, 0.2); }
 
-            .iot-btn { cursor: pointer; color: var(--text-main); font-weight: bold; user-select: none; }
-            .iot-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.02); }
-            .iot-btn.on { background: rgba(255, 140, 0, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(255, 140, 0, 0.2); }
+    /* A weather-cell-ből kivettem a backgroundot, mert most már az alap grid-cell is pont ilyen sötét */
+    .weather-cell { box-shadow: inset 0 0 20px rgba(0,0,0,0.1); cursor: default; }
+    .weather-icon { font-size: 2.2rem; margin-bottom: 5px; }
+    .weather-temp { font-size: 1.5rem; font-weight: bold; color: var(--text-main); line-height: 1; }
 
-            .weather-cell { background: rgba(0, 0, 0, 0.15); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); cursor: default; }
+    /* A konzol kapott egy 'box-sizing: border-box;'-t, így most már 100%-ig egyvonalban lesz a fenti rács széleivel */
+    .iot-console { box-sizing: border-box; width: 95%; max-width: 1200px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-left: 4px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-family: monospace; color: #ffffff; font-size: 0.85rem; }
 
-            /* Kicsit visszavettük a betűméreteket, hogy a 90%-os dobozban is jól mutassanak */
-            .weather-icon { font-size: 2.2rem; margin-bottom: 5px; }
-            .weather-temp { font-size: 1.5rem; font-weight: bold; color: var(--text-main); line-height: 1; }
+    @media (max-width: 900px) { .iot-main-layout { grid-template-columns: 1fr; } }
+</style>
 
-            /* ALSÓ SÁV: Ezt is 90%-ra vettük és középre igazítottuk a rácshoz */
-            .iot-console {
-                width: 95%;
-                max-width: 1200px;
-                margin: 0 auto;
-                background: rgba(0, 0, 0, 0.3);
-                border: 1px solid var(--glass-border);
-                border-left: 4px solid var(--accent);
-                padding: 8px 15px;
-                border-radius: 10px;
-                font-family: monospace;
-                color: #a0a0a0;
-                font-size: 0.85rem;
-            }
+        <h2 style="text-align: center; color: var(--accent); margin-bottom: 5px; font-size: 1.5rem;">OTTHON VEZÉRLÉS</h2>
 
-            @media (max-width: 900px) { .iot-main-layout { grid-template-columns: 1fr; } }
-        </style>
-
-        <h2 style="text-align: center; color: var(--accent); margin-bottom: 15px; font-size: 1.5rem;">OTTHON VEZÉRLÉS</h2>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 0; margin-bottom: 25px; font-style: italic;">
+            Mert egy sima PDF önéletrajz unalmas. Kattints bátran, ezekkel tényleg a lakásban kapcsolgatod a villanyt!
+        </p>
 
         <div class="iot-main-layout">
             <div class="iot-2x2-grid">
@@ -411,8 +447,8 @@ async function initIoTModule() {
     await fetchIoTStatus();
 }
 
-// Konzol üzenet segédfüggvény (támogatja a V1-es színeket)
-function logIoTMessage(message, color = "#a0a0a0") {
+// Konzol üzenet segédfüggvény (Az alapértelmezett szín mostantól fehér)
+function logIoTMessage(message, color = "#ffffff") {
     const consoleEl = document.getElementById('iot-console');
     if (consoleEl) {
         const time = new Date().toLocaleTimeString('hu-HU', { hour: '2-digit', minute:'2-digit', second:'2-digit' });
@@ -420,7 +456,6 @@ function logIoTMessage(message, color = "#a0a0a0") {
     }
 }
 
-// UI állapot frissítése (V2 div osztályokkal, nem checkboxszal)
 function updateButtonState(device, isOn) {
     const btn = document.getElementById(`btn-${device}`);
     if(btn) {
@@ -429,7 +464,6 @@ function updateButtonState(device, isOn) {
     }
 }
 
-// --- V1: STÁTUSZ LEKÉRDEZÉS ---
 async function fetchIoTStatus() {
     const token = sessionStorage.getItem('jwt_token');
     try {
@@ -439,16 +473,15 @@ async function fetchIoTStatus() {
             updateButtonState('bulb1', data.bulb1);
             updateButtonState('bulb2', data.bulb2);
             updateButtonState('switch', data.switch);
-            logIoTMessage("Rendszer online. Kapcsolat a Tuya felhővel aktív.", "#00ff88");
+            logIoTMessage("Rendszer online. Kapcsolat a Tuya felhővel aktív."); // Fehér lesz
         } else {
-            logIoTMessage("Nem sikerült lekérdezni az eszközök állapotát.", "#ff4444");
+            logIoTMessage("Nem sikerült lekérdezni az eszközök állapotát.", "#ff4444"); // Piros lesz
         }
     } catch (error) {
-        logIoTMessage("Hálózati hiba az állapot lekérdezésekor.", "#ff4444");
+        logIoTMessage("Hálózati hiba az állapot lekérdezésekor.", "#ff4444"); // Piros lesz
     }
 }
 
-// --- V1: GOMBNYOMÁS LOGIKA ÉS VÉDELEM ---
 async function toggleDevice(device) {
     if (isLockedOut) return;
 
@@ -457,7 +490,6 @@ async function toggleDevice(device) {
     const action = !isCurrentlyOn ? 'on' : 'off';
     const token = sessionStorage.getItem('jwt_token');
 
-    // V1 Számláló: Csak a felkapcsolásokat számoljuk
     if (action === 'on') {
         turnOnCount++;
         if (turnOnCount >= 4) {
@@ -466,10 +498,9 @@ async function toggleDevice(device) {
         }
     }
 
-    // Gomb vizuális tiltása, amíg tölt
     btn.style.pointerEvents = 'none';
-    logIoTMessage("Parancs szinkronizálása a felhővel...", "#ffdd00");
-    updateButtonState(device, action === 'on'); // Optimista UI frissítés
+    logIoTMessage("Parancs szinkronizálása a felhővel..."); // Fehér lesz
+    updateButtonState(device, action === 'on');
 
     try {
         const response = await fetch(`/api/iot/${device}/${action}`, {
@@ -479,40 +510,36 @@ async function toggleDevice(device) {
 
         if (response.ok) {
             if (action === 'on') {
-                logIoTMessage("Siker: Eszköz felkapcsolva! (Biztonsági okokból 2 perc múlva automatikusan lekapcsol)", "#00ff88");
+                logIoTMessage("Siker: Eszköz felkapcsolva! (Biztonsági okokból 2 perc múlva automatikusan lekapcsol)"); // Fehér lesz
                 setTimeout(() => {
                     if (!isLockedOut) {
-                        logIoTMessage("Automatikus lekapcsolás szinkronizálása a felhővel...", "#ffdd00");
+                        logIoTMessage("Automatikus lekapcsolás szinkronizálása a felhővel..."); // Fehér lesz
                     }
                     fetchIoTStatus();
                 }, 122000);
             } else {
-                logIoTMessage("Siker: Eszköz lekapcsolva!", "#00ff88");
+                logIoTMessage("Siker: Eszköz lekapcsolva!"); // Fehér lesz
             }
         } else {
-            // Revertálás
             updateButtonState(device, isCurrentlyOn);
             if (response.status === 429) {
-                logIoTMessage("Védelmi rendszer: Túl sok gyors kattintás! Kérlek, várj egy picit.", "#ff4444");
+                logIoTMessage("Védelmi rendszer: Túl sok gyors kattintás! Kérlek, várj egy picit.", "#ff4444"); // PIROS
             } else {
-                logIoTMessage("Hiba történt a vezérlés során.", "#ff4444");
+                logIoTMessage("Hiba történt a vezérlés során.", "#ff4444"); // PIROS
             }
         }
     } catch (error) {
         updateButtonState(device, isCurrentlyOn);
-        logIoTMessage("Hálózati hiba történt.", "#ff4444");
+        logIoTMessage("Hálózati hiba történt.", "#ff4444"); // PIROS
     } finally {
         setTimeout(() => {
-            if (!isLockedOut) { btn.style.pointerEvents = 'auto'; } // Engedjük újra nyomni
+            if (!isLockedOut) { btn.style.pointerEvents = 'auto'; }
         }, 1500);
     }
 }
 
-// --- V1: 5 PERCES TILTÓ LOGIKA ---
 function triggerLockout() {
     isLockedOut = true;
-
-    // Szinkronizáljuk a valós állapotot, ha esetleg félrekattintott
     fetchIoTStatus();
 
     const buttons = ['btn-bulb1', 'btn-bulb2', 'btn-switch'];
@@ -521,7 +548,7 @@ function triggerLockout() {
         if(el) { el.style.pointerEvents = 'none'; el.style.opacity = '0.4'; }
     });
 
-    logIoTMessage("Védelmi Rendszer: Elérted a limitet! A gombok 5 percre letiltva.", "#ff4444");
+    logIoTMessage("Védelmi Rendszer: Elérted a limitet! A gombok 5 percre letiltva.", "#ff4444"); // PIROS
 
     setTimeout(() => {
         isLockedOut = false;
@@ -532,11 +559,10 @@ function triggerLockout() {
             if(el) { el.style.pointerEvents = 'auto'; el.style.opacity = '1'; }
         });
 
-        logIoTMessage("Zár feloldva. A kapcsolók újra használhatók.", "#00ff88");
+        logIoTMessage("Zár feloldva. A kapcsolók újra használhatók."); // Fehér lesz
     }, 300000);
 }
 
-// --- V1: GRAFIKON FRISSÍTÉS (Meglévő canvas frissítése) + V2 Dizájn ---
 async function fetchAndDrawChart() {
     const token = sessionStorage.getItem('jwt_token');
     try {
@@ -544,7 +570,6 @@ async function fetchAndDrawChart() {
         if (response.ok) {
             const data = await response.json();
 
-            // Szoba klíma ikon frissítése a V2 kártyán
             if (data.temperatures && data.temperatures.length > 0) {
                 const currentTemp = data.temperatures[data.temperatures.length - 1];
                 document.getElementById('room-temp').innerText = currentTemp + '°C';
@@ -567,7 +592,6 @@ async function fetchAndDrawChart() {
                 plugins: { legend: { display: false } }
             };
 
-            // Hőmérséklet (V1 update logika)
             if (tempChartInstance) {
                 tempChartInstance.data.labels = data.labels;
                 tempChartInstance.data.datasets[0].data = data.temperatures;
@@ -580,7 +604,6 @@ async function fetchAndDrawChart() {
                 });
             }
 
-            // Páratartalom (V1 update logika)
             if (humChartInstance) {
                 humChartInstance.data.labels = data.labels;
                 humChartInstance.data.datasets[0].data = data.humidities;
@@ -597,39 +620,3 @@ async function fetchAndDrawChart() {
         console.error("Hiba a grafikon adatainak lekérésekor:", error);
     }
 }
-
-// 6. PROFILKÉP BETÖLTÉSE "GUMIS" ANIMÁCIÓVAL
-            const profilePicContainer = document.getElementById('dynamic-profile-pic');
-            if (profilePicContainer) {
-                profilePicContainer.innerHTML = `
-                    <style>
-                        .morphing-blob-pic {
-                            width: 200px;
-                            height: 200px;
-                            /* IDE ÍRD BE A KÉPED PONTOS NEVÉT ÉS KITERJESZTÉSÉT */
-                            background-image: url('/static/profile.jpg');
-                            background-size: cover;
-                            background-position: center;
-                            border: 3px solid var(--accent);
-                            box-shadow: 0 0 25px rgba(255, 140, 0, 0.3);
-                            /* A kulcs: 8 másodperces, folyamatos, lágy alakváltó animáció */
-                            animation: profileMorph 8s ease-in-out infinite;
-                            transition: all 0.5s ease;
-                        }
-
-                        /* Ha ráhúzod az egeret, picit kiemelkedik */
-                        .morphing-blob-pic:hover {
-                            transform: scale(1.05);
-                            box-shadow: 0 0 35px rgba(255, 140, 0, 0.5);
-                        }
-
-                        /* Ez a kulcskocka animáció görbíti a sarkokat folyamatosan */
-                        @keyframes profileMorph {
-                            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-                            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-                            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-                        }
-                    </style>
-                    <div class="morphing-blob-pic"></div>
-                `;
-            }
