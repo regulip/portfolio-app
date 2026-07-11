@@ -38,16 +38,7 @@ async function attemptGlassLogin() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const passwordInput = document.getElementById('password-input');
-    if(passwordInput) {
-        passwordInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                attemptGlassLogin();
-            }
-        });
-    }
-});
+// Enter gomb figyelése a jelszó mezőn
 
 async function loadPortfolioDataV2() {
     await fetchPersonalData();
