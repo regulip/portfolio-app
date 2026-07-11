@@ -73,11 +73,11 @@ body {
     margin-bottom: 20px;
 }
 
-/* --- AZ ÜVEG KÁRTYÁK (RUGALMAS KONTÉNER) --- */
+/* --- AZ ÜVEG KÁRTYÁK (RUGALMAS KONTÉNER + GUMI ANIMÁCIÓ) --- */
 .glass-card {
     width: 100%;
     max-width: 1100px;
-    height: auto; /* A kártya magassága a tartalomtól függ */
+    height: auto;
     min-height: 200px;
 
     background: var(--glass-bg);
@@ -85,9 +85,10 @@ body {
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
 
-    border-radius: 30px; /* Szép, egyenletes ív, amiből nem folyik ki a szöveg */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    /* Visszakapja a lélegző, gumis mozgást! */
+    animation: cardMorph 8s ease-in-out infinite alternate;
 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -100,6 +101,13 @@ body {
 .glass-card:hover {
     border: 1px solid rgba(255, 255, 255, 0.4);
     transform: translateY(-5px);
+}
+
+/* Az új, tartalom-barát gumis animáció (pixel alapú, így nem nyomja össze a szöveget!) */
+@keyframes cardMorph {
+    0% { border-radius: 30px; }
+    50% { border-radius: 60px 15px 50px 20px; }
+    100% { border-radius: 15px 60px 20px 50px; }
 }
 
 .hero-card h1 {
