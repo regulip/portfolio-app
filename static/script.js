@@ -379,15 +379,16 @@ async function initIoTModule() {
 
     iotCard.innerHTML = `
         <style>
-          .iot-main-layout {
+                .iot-main-layout {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 15px;
-                width: 100%; /* 100% szélesség */
+                width: 100%;
                 max-width: 1000px;
-                margin: 0 auto;
-                padding: 0 20px; /* Belső margó, hogy ne érjen a széléhez */
-                box-sizing: border-box; /* FONTOS: ez teszi egyformává a dobozokat */
+                margin: 0 auto !important; /* !important kényszeríti a középre igazítást */
+                padding: 0 20px;
+                box-sizing: border-box;
+            }
 }
     .iot-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
     .iot-charts-col { display: flex; flex-direction: column; gap: 10px; }
@@ -430,7 +431,7 @@ async function initIoTModule() {
         .iot-console {
             width: 100%;
             max-width: 1000px;
-            margin: 15px auto 0 auto; /* A grid alatt, középre igazítva */
+            margin: 15px auto 0 auto !important; /* A grid alatt, középre igazítva */
             box-sizing: border-box; /* Ez húzza egy vonalba a grid széleivel */
             padding: 10px 20px;
             background: rgba(0, 0, 0, 0.3);
