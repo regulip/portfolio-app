@@ -105,9 +105,22 @@ body {
 
 /* Az új, tartalom-barát gumis animáció (pixel alapú, így nem nyomja össze a szöveget!) */
 @keyframes cardMorph {
-    0% { border-radius: 30px; }
-    50% { border-radius: 60px 15px 50px 20px; }
-    100% { border-radius: 15px 60px 20px 50px; }
+    /* A perjel (/) előtti számok a vízszintes, a perjel utániak a függőleges íveket adják */
+
+    /* 1. állapot: Jobbra dőlő kavics */
+    0% {
+        border-radius: 80px 30px 100px 40px / 40px 90px 30px 100px;
+    }
+
+    /* 2. állapot: Áthullámzik egy balra dőlő, kicsit laposabb formába */
+    50% {
+        border-radius: 30px 100px 40px 80px / 100px 40px 90px 30px;
+    }
+
+    /* 3. állapot: Egy harmadik, teljesen aszimmetrikus "kő" forma */
+    100% {
+        border-radius: 90px 40px 80px 30px / 30px 80px 40px 90px;
+    }
 }
 
 .hero-card h1 {
