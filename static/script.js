@@ -87,7 +87,7 @@ async function fetchPersonalData() {
             const aboutCard = document.getElementById('about-me');
             aboutCard.innerHTML = `
                 <h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; text-align: center;">Bemutatkozás</h2>
-                <p style="line-height: 1.8; font-size: 1.1rem; text-align: justify; color: var(--text-main);">
+                <p style="line-height: 1.5; font-size: 0.95rem; text-align: justify; color: var(--text-main);">
                     ${data.personal_info.introduction}
                 </p>
             `;
@@ -256,13 +256,13 @@ async function fetchGitHubProjects() {
             repos.slice(0, 6).forEach(repo => {
                 html += `
                     <a href="${repo.html_url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 210px;">
-                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 190px; display: flex; flex-direction: column; justify-content: space-between;"
+                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 180px; display: flex; flex-direction: column; justify-content: space-between;"
                              onmouseover="this.style.background='rgba(255, 140, 0, 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
                             <div>
                                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${repo.name}</h3>
-                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.8rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
                                     ${repo.description || 'Nincs megadva leírás ehhez a projekthez.'}
                                 </p>
                             </div>
@@ -333,7 +333,7 @@ async function fetchGitHubProjects() {
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
                             <div>
-                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
+                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.0rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
                                 <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
                                     ${proj.description}
                                 </p>
@@ -379,16 +379,43 @@ async function initIoTModule() {
 
     iotCard.innerHTML = `
         <style>
-    .iot-main-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; width: 85%; max-width: 900px; margin: 0 auto 15px auto; }
+          .iot-main-layout {
+            display: grid;
+             /* 3 egyenlő szélességű oszlopot hozunk létre */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 95%;
+            max-width: 1000px;
+            margin: 0 auto;
+            }
     .iot-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
     .iot-charts-col { display: flex; flex-direction: column; gap: 10px; }
 
     /* A diagram doboza marad az eredeti sötét szín: rgba(0, 0, 0, 0.15) */
-    .chart-box { flex: 1; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); border-radius: 15px; padding: 10px; position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 120px; }
+             .chart-box {
+                padding: 10px;
+                position: relative; /* Hogy a feliratot lehessen pozícionálni */
+                overflow: hidden;
+            }
 
+            /* A grafikon feliratát (Hőmérséklet) kényszerítsük felülre */
+            .chart-title {
+                font-size: 0.75rem;
+                color: #666;
+                margin-bottom: 5px;
+                display: block;
+            }
     /* A gombok (grid-cell) is megkapták UGYANAZT a sötétebb színt, mint a diagramok! */
-    .grid-cell { background: rgba(0, 0, 0, 0.15); border: 2px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(5px); transition: all 0.3s ease; aspect-ratio: 1; }
-
+          .grid-cell, .chart-box {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            height: 180px; /* Fix magasság mindennek */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
     .iot-btn { cursor: pointer; color: var(--text-main); font-weight: bold; user-select: none; }
     .iot-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.02); }
     .iot-btn.on { background: rgba(255, 140, 0, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(255, 140, 0, 0.2); }
@@ -399,8 +426,20 @@ async function initIoTModule() {
     .weather-temp { font-size: 1.5rem; font-weight: bold; color: var(--text-main); line-height: 1; }
 
     /* A konzol kapott egy 'box-sizing: border-box;'-t, így most már 100%-ig egyvonalban lesz a fenti rács széleivel */
-    .iot-console { box-sizing: border-box; width: 95%; max-width: 1200px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-left: 4px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-family: monospace; color: #ffffff; font-size: 0.85rem; }
-
+        .iot-console {
+            box-sizing: border-box;
+            width: 95%; /* Legyen ugyanakkora széles, mint a grid */
+            max-width: 1000px;
+            margin: 20px auto 0 auto; /* Térköz a grid alatt */
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--accent);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            color: #ffffff;
+            font-size: 0.85rem;
+        }
     @media (max-width: 900px) { .iot-main-layout { grid-template-columns: 1fr; } }
 </style>
 
@@ -429,14 +468,14 @@ async function initIoTModule() {
             </div>
 
             <div class="iot-charts-col">
-                <div class="chart-box">
-                    <div style="position: absolute; top: 10px; left: 15px; font-size: 0.75rem; color: var(--accent);">Hőmérséklet (°C)</div>
-                    <canvas id="tempChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <div style="position: absolute; top: 10px; left: 15px; font-size: 0.75rem; color: #4da6ff;">Páratartalom (%)</div>
-                    <canvas id="humChart"></canvas>
-                </div>
+                    <div class="chart-box">
+                            <div class="chart-title" style="color: var(--accent);">Hőmérséklet (°C)</div>
+                            <canvas id="tempChart" style="max-height: 120px;"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <div class="chart-title" style="color: #4da6ff;">Páratartalom (%)</div>
+                            <canvas id="humChart" style="max-height: 120px;"></canvas>
+                        </div>
             </div>
         </div>
 
