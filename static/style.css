@@ -59,7 +59,7 @@ body {
     scroll-behavior: smooth;
 
     /* Ez az a sor, ami bekapcsolja a mágneses ugrást! */
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
 }
 
 /* A szekciók mostantól rugalmasan nyúlnak a tartalommal, de ugranak */
