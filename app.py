@@ -13,6 +13,8 @@ import json
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from zoneinfo import ZoneInfo
+
+
 # --- 1. BEÁLLÍTÁSOK ÉS KÖRNYEZETI VÁLTOZÓK ---
 load_dotenv()
 
@@ -162,27 +164,38 @@ def login():
 
 @app.route('/api/portfolio-data', methods=['GET'])
 @token_required
+
+# def get_portfolio_data():
+#     """ Ezentúl az adatbázisból kéri le a portfóliót, nem a fájlból! """
+#     try:
+#         conn = get_db_connection()
+#         if not conn:
+#             return jsonify({"message": "Nincs DB kapcsolat"}), 500
+#
+#         c = conn.cursor(cursor_factory=RealDictCursor)
+#         # Lekérjük a legfrissebb mentett önéletrajzot
+#         c.execute("SELECT content FROM portfolio_data ORDER BY id DESC LIMIT 1")
+#         row = c.fetchone()
+#         c.close()
+#         conn.close()
+#
+#         if row and row['content']:
+#             return jsonify(row['content'])
+#         else:
+#             return jsonify({"message": "Nincs adat az adatbázisban!"}), 404
+#     except Exception as e:
+#         print(f"Hiba az adatok lekérésekor: {e}")
+#         return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
+
 def get_portfolio_data():
-    """ Ezentúl az adatbázisból kéri le a portfóliót, nem a fájlból! """
     try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({"message": "Nincs DB kapcsolat"}), 500
+        # LOKÁLIS FEJLESZTÉS: Adatbázis helyett a JSON fájlt olvassuk fel!
+        with open('portfolio.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data), 200
 
-        c = conn.cursor(cursor_factory=RealDictCursor)
-        # Lekérjük a legfrissebb mentett önéletrajzot
-        c.execute("SELECT content FROM portfolio_data ORDER BY id DESC LIMIT 1")
-        row = c.fetchone()
-        c.close()
-        conn.close()
-
-        if row and row['content']:
-            return jsonify(row['content'])
-        else:
-            return jsonify({"message": "Nincs adat az adatbázisban!"}), 404
     except Exception as e:
-        print(f"Hiba az adatok lekérésekor: {e}")
-        return jsonify({"message": "Hiba történt az adatok betöltésekor."}), 500
+        return jsonify({"message": f"Hiba az adatok betöltésekor: {e}"}), 500
 
 @app.route('/api/temperature', methods=['GET'])
 @token_required
