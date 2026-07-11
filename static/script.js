@@ -255,8 +255,8 @@ async function fetchGitHubProjects() {
             // GitHub kártyák legenerálása
             repos.slice(0, 6).forEach(repo => {
                 html += `
-                    <a href="${repo.html_url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 260px;">
-                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
+                    <a href="${repo.html_url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 210px;">
+                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 190px; display: flex; flex-direction: column; justify-content: space-between;"
                              onmouseover="this.style.background='rgba(255, 140, 0, 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
@@ -379,7 +379,7 @@ async function initIoTModule() {
 
     iotCard.innerHTML = `
         <style>
-    .iot-main-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; width: 95%; max-width: 1200px; margin: 0 auto 15px auto; }
+    .iot-main-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; width: 85%; max-width: 900px; margin: 0 auto 15px auto; }
     .iot-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
     .iot-charts-col { display: flex; flex-direction: column; gap: 10px; }
 
