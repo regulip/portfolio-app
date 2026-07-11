@@ -38,7 +38,34 @@ async function attemptGlassLogin() {
     }
 }
 
-// Enter gomb figyelése a jelszó mezőn
+// // --- AUTOMATIKUS BEJELENTKEZÉS LINKBŐL ÉS ENTER FIGYELÉS ---
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('password-input');
+
+    // 1. Enter gomb figyelése (ha valaki manuálisan írja be)
+    if(passwordInput) {
+        passwordInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                attemptGlassLogin();
+            }
+        });
+    }
+
+    // 2. Automatikus "Magic Link" bejelentkezés
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoKey = urlParams.get('key'); // Keresi a "?key=..." részt a linkben
+
+    if (autoKey) {
+        // Ha van kulcs a linkben, beteszi a rejtett mezőbe...
+        if(passwordInput) passwordInput.value = autoKey;
+
+        // ...és azonnal rányom a belépés gombra a háttérben
+        attemptGlassLogin();
+
+        // Eltüntetjük a jelszót a címsorból a belépés után!
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
 
 async function loadPortfolioDataV2() {
     await fetchPersonalData();
