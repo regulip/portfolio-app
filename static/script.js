@@ -518,7 +518,7 @@ async function fetchAndDrawChart() {
             const commonOptions = {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                layout: { padding: { top: 15, bottom: 0, left: 0, right: 0 } },
+                layout: { padding: { top: 20, bottom: 0, left: 0, right: 0 } },
                 scales: {
                     x: { display: false },
                     y: { ticks: { color: '#888', font: {size: 10} }, grid: { color: 'rgba(255,255,255,0.05)' } }

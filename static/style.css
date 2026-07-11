@@ -50,27 +50,31 @@ body {
     100% { transform: translate(15vw, -10vh) scale(1.15); }
 }
 
-/* --- STRUKTÚRA ÉS GÖRGETÉS --- */
+/* --- STRUKTÚRA ÉS GÖRGETÉS (Mágneses ugrás visszatétele) --- */
 #main-content {
     width: 100%;
-    min-height: 100vh;
+    height: 100vh; /* Fontos: fix 100vh kell, hogy ez legyen a görgethető ablak */
+    overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
-    padding-top: 30px;
-    padding-bottom: 30px;
+
+    /* Ez az a sor, ami bekapcsolja a mágneses ugrást! */
+    scroll-snap-type: y mandatory;
 }
 
-/* A szekciók mostantól rugalmasan nyúlnak a tartalommal */
+/* A szekciók mostantól rugalmasan nyúlnak a tartalommal, de ugranak */
 .fullscreen-section {
     width: 100%;
-    height: auto; /* A lényeg: nem fix 100vh! */
-    min-height: 50vh;
+    height: auto;
+    min-height: 100vh; /* Legalább egy képernyőnyi legyen, hogy működjön az ugrás */
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 15px 3vw;
     box-sizing: border-box;
-    margin-bottom: 20px;
+
+    /* Amikor idegörgetsz, pontosan középre húzza be a kártyát */
+    scroll-snap-align: center;
 }
 
 /* --- AZ ÜVEG KÁRTYÁK (RUGALMAS KONTÉNER + GUMI ANIMÁCIÓ) --- */
@@ -213,6 +217,12 @@ button:hover {
 
 /* --- KŐKEMÉNY MOBIL OPTIMALIZÁLÁS --- */
 @media (max-width: 768px) {
+
+    /* Mobilon kikapcsoljuk az ugrálást, hogy a hosszú szövegek is olvashatóak maradjanak */
+    #main-content {
+        scroll-snap-type: none;
+    }
+
     /* Mobilon a padding és a margók drasztikus csökkentése */
     .fullscreen-section {
         padding: 5px;
