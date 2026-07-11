@@ -358,13 +358,13 @@ async function initIoTModule() {
         <div class="iot-main-layout">
             <div class="iot-2x2-grid">
                 <div id="btn-bulb1" onclick="toggleDevice('bulb1')" class="grid-cell iot-btn off">
-                    <span style="font-size: 1.5rem;">💡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Lámpa 1</span>
+                    <span style="font-size: 1.5rem;">💡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Nappali hangulatfény</span>
                 </div>
                 <div id="btn-bulb2" onclick="toggleDevice('bulb2')" class="grid-cell iot-btn off">
-                    <span style="font-size: 1.5rem;">💡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Lámpa 2</span>
+                    <span style="font-size: 1.5rem;">💡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Hálószoba lámpa</span>
                 </div>
                 <div id="btn-switch" onclick="toggleDevice('switch')" class="grid-cell iot-btn off">
-                    <span style="font-size: 1.5rem;">⚡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Főkapcsoló</span>
+                    <span style="font-size: 1.5rem;">💡</span><span style="font-size: 0.75rem; margin-top: 5px; text-transform: uppercase;">Nappali lámpa</span>
                 </div>
                 <div class="grid-cell weather-cell">
                     <div class="weather-icon" id="room-icon">🌡️</div>
