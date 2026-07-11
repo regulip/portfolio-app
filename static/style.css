@@ -1,179 +1,240 @@
-/* Alapbeállítások és Sötét Mód */
+/* --- ALAPOK ÉS HÁTTÉR --- */
 :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-main: #ffffff;
-    --text-muted: #b3b3b3;
-    --accent: #00ff88;
+    --glass-bg: rgba(255, 255, 255, 0.7); /* Fehéres, enyhén áttetsző üveg */
+    --glass-border: rgba(255, 255, 255, 1);
+    --glass-blur: blur(20px);
+    --text-main: #2d2d2d;
+    --text-muted: #666666;
+    --accent: #ff8c00; /* Narancs kiemelés */
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
     margin: 0;
     padding: 0;
-    line-height: 1.6;
-}
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-main);
 
-/* Középre igazított konténerek */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+    /* Sima, elegáns törtfehér/világosszürke háttér (Apple stílus) */
+    background-color: #f5f5f7;
 
-/* Bejelentkező doboz */
-#login-section {
     height: 100vh;
+    overflow: hidden;
+}
+
+/* --- LÜKTETŐ BLOB HÁTTÉR ANIMÁCIÓ --- */
+.background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-color: #f5f5f7;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px); /* Kisebb elmosás, mivel a gömbök is kisebbek lettek */
+    opacity: 0.55;
+    animation: float 20s infinite ease-in-out alternate;
+}
+
+/* 1. Gömb: Az eredeti, élénkebb narancs */
+.blob-1 {
+    background: #ff8c00;
+    width: 25vw;
+    height: 25vw;
+    top: 5%;
+    left: 10%;
+    animation-duration: 22s;
+}
+
+/* 2. Gömb: Világosabb, pasztell narancs/barack */
+.blob-2 {
+    background: #ffb732;
+    width: 18vw;
+    height: 18vw;
+    bottom: 15%;
+    right: 20%;
+    animation-duration: 28s;
+    animation-direction: alternate-reverse;
+    animation-delay: -5s; /* Már eltolva indul */
+}
+
+/* 3. Gömb: A kékes-szürke kontraszt */
+.blob-3 {
+    background: #a0aab5;
+    width: 22vw;
+    height: 22vw;
+    top: 35%;
+    right: 5%;
+    animation-duration: 25s;
+    animation-delay: -12s;
+}
+
+/* 4. Gömb: Nagyon világos, meleg törtfehér/homokszín árnyalat */
+.blob-4 {
+    background: #e1e5ea;
+    width: 28vw;
+    height: 28vw;
+    bottom: 5%;
+    left: 25%;
+    animation-duration: 32s;
+    animation-direction: alternate-reverse;
+    animation-delay: -8s;
+}
+
+/* Maga a lebegő animáció (finomabb mozgástérrel a kisebb méret miatt) */
+@keyframes float {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(10vw, 8vh) scale(1.1);
+    }
+    66% {
+        transform: translate(-8vw, 15vh) scale(0.9);
+    }
+    100% {
+        transform: translate(15vw, -10vh) scale(1.15);
+    }
+}
+
+
+/* --- STRUKTÚRA ÉS GÖRGETÉS --- */
+#main-content {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll;
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+}
+
+/* Egy teljes képernyős diakocka */
+.fullscreen-section {
+    height: 100vh;
+    width: 100vw;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3vh 3vw; /* Ez adja meg a margót a kártyák körül! */
+    box-sizing: border-box;
+}
+
+/* --- AZ ÜVEG KÁRTYÁK (GLASS CARD) --- */
+.glass-card {
+    width: 100%;
+    height: 100%; /* Kitölti a rendelkezésre álló teret a margókon belül */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px; /* Szép nagy lekerekítés a rajzod alapján */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Nagyon finom árnyék */
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 40px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease, border 0.3s ease;
+}
+
+.glass-card:hover {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px); /* Finom lebegés egerészéskor */
+}
+
+/* A Hero kártya egyedi szövegformázása */
+.hero-card h1 {
+    font-size: 3.5rem;
+    margin: 0;
+    /* Sötétszürke színátmenet, hogy látszódjon a fehér háttéren */
+    background: -webkit-linear-gradient(#2d2d2d, #666666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-card h3 {
+    color: var(--text-muted);
+}
+
+
+/* --- A "ZSILIP" (BEJELENTKEZŐ RÉTEG) --- */
+#login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.glass-login-card {
+    background: rgba(255, 255, 255, 0.45); /* Világosított üveg */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 40px;
     text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
 }
 
-.login-box {
-    background-color: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    margin-top: 20px;
+.glass-login-card h2, .glass-login-card p {
+    color: var(--text-main);
 }
 
+/* --- A BETÖLTÖTT OLDAL ELMOSÁSA (VÉDŐRÉTEG) --- */
+.blurred-content {
+    filter: blur(12px);
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+    transition: filter 0.8s ease, opacity 0.8s ease;
+}
+
+/* --- GOMBOK ÉS INPUTOK ÜVEG STÍLUSBAN --- */
 input[type="password"] {
+    width: 80%;
     padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background: #2d2d2d;
-    color: white;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.6); /* Világosabb beviteli mező */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    color: var(--text-main);
     outline: none;
-    margin-right: 10px;
+    font-size: 16px;
+    backdrop-filter: blur(5px);
+}
+
+input[type="password"]:focus {
+    border-color: var(--accent);
 }
 
 button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    background-color: var(--accent);
-    color: #000;
+    padding: 12px 30px;
+    background: rgba(255, 140, 0, 0.1); /* Halvány narancs háttér */
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
+    backdrop-filter: blur(5px);
 }
 
 button:hover {
-    box-shadow: 0 0 15px var(--accent);
-    transform: scale(1.05);
-}
-
-/* Portfólió Navigáció */
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid #333;
-    position: sticky;
-    top: 0;
-    background: var(--bg-color);
-    z-index: 100;
-}
-
-/* Kártyák (Tapasztalat, Készségek) */
-.card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--accent);
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.6s forwards;
-}
-
-.card h4 {
-    margin: 0 0 10px 0;
-    color: var(--accent);
-}
-
-.date {
-    font-size: 0.85em;
-    color: var(--text-muted);
-}
-
-ul {
-    list-style-type: square;
-    color: var(--text-muted);
-}
-
-/* Animáció a görgetéshez */
-@keyframes fadeUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* IoT Szekció (Előkészítés) */
-#iot-section {
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px dashed #444;
-}
-
-/* Billenő kapcsoló (Toggle Switch) dizájn */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 54px;
-    height: 28px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ff4444; /* Kikapcsolt állapot (piros) */
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-/* Bekapcsolt állapot (zöld) */
-input:checked + .slider {
-    background-color: #00ff88;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Ha töltés alatt van, halványítjuk */
-input:disabled + .slider {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Grafikon mobilos nézetének javítása és növekedés blokkolása */
-#tempChart {
-    max-height: 350px !important;
-    width: 100% !important;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); /* Narancs ragyogás */
 }
