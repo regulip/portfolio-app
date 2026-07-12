@@ -39,10 +39,11 @@ body {
     animation: float 20s infinite ease-in-out alternate;
 }
 
-.blob-1 { background: var(--accent); width: 25vw; height: 25vw; top: 5%; left: 10%; animation-duration: 22s; }
-.blob-2 { background: #ffb732; width: 18vw; height: 18vw; bottom: 15%; right: 20%; animation-duration: 28s; animation-direction: alternate-reverse; animation-delay: -5s; }
-.blob-3 { background: #a0aab5; width: 22vw; height: 22vw; top: 35%; right: 5%; animation-duration: 25s; animation-delay: -12s; }
-.blob-4 { background: #e1e5ea; width: 28vw; height: 28vw; bottom: 5%; left: 25%; animation-duration: 32s; animation-direction: alternate-reverse; animation-delay: -8s; }
+/* Hátsó szines gömbök*/
+.blob-1 { background: var(--accent); width: 25vw; height: 25vw; top: 5%; left: 10%; animation-duration: 22s; } /* dinamikusan változik*/
+.blob-2 { background: #ffb732; width: 18vw; height: 18vw; bottom: 15%; right: 20%; animation-duration: 28s; animation-direction: alternate-reverse; animation-delay: -5s; } /* Fix sárga*/
+.blob-3 { background: #a0aab5; width: 22vw; height: 22vw; top: 35%; right: 5%; animation-duration: 25s; animation-delay: -12s; } /* Fix sötétszürke */
+.blob-4 { background: #e1e5ea; width: 28vw; height: 28vw; bottom: 5%; left: 25%; animation-duration: 32s; animation-direction: alternate-reverse; animation-delay: -8s; } /* Fix világosszürke */
 
 @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
