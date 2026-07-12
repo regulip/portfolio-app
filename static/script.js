@@ -129,7 +129,7 @@ async function fetchPersonalData() {
             let skillsHTML = `
                 <h2 style="margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; text-align: center;">
                     <span style="color: #ff4444;">Tanfolyamok</span>,
-                    <span style="color: var(--accent);">készségek</span> &
+                    <span style="color: #ff8c00;">készségek</span> &
                     <span style="color: #4da6ff;">hobbik</span>
                 </h2>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
@@ -205,7 +205,7 @@ async function fetchPersonalData() {
 
 function generateSkillBadge(skillName, type) {
     let bgColor, borderColor;
-    if (type === 'skill') { bgColor = 'rgba(204, 0, 0, 0.15)'; borderColor = 'var(--accent)'; }
+    if (type === 'skill') { bgColor = 'rgba(255, 140, 0, 0.15)'; borderColor = '#ff8c00'; }
     else if (type === 'cert') { bgColor = 'rgba(255, 68, 68, 0.15)'; borderColor = '#ff4444'; }
     else if (type === 'hobby') { bgColor = 'rgba(77, 166, 255, 0.15)'; borderColor = '#4da6ff'; }
 
@@ -359,7 +359,7 @@ async function initIoTModule() {
             .weather-icon { font-size: 2.2rem; margin-bottom: 5px; }
             .weather-temp { font-size: 1.5rem; font-weight: bold; color: var(--text-main); line-height: 1; }
 
-            .iot-console { box-sizing: border-box; width: 95%; max-width: 1200px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-left: 4px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-family: monospace; color: #ffffff; font-size: 0.85rem; }
+            .iot-console { box-sizing: border-box; width: 85%; max-width: 900px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--glass-border); border-left: 4px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-family: monospace; color: #ffffff; font-size: 0.85rem; }
 
             /* MOBIL-OPTIMALIZÁLÁS AZ IOT MODULHOZ */
             @media (max-width: 900px) {
