@@ -551,8 +551,7 @@ async function fetchAndDrawChart() {
             } else {
                 tempChartInstance = new Chart(ctxTemp, {
                     type: 'line',
-                    data: { labels: data.labels, datasets: [{ data: data.temperatures, borderColor: '#cc0000', backgroundColor: 'rgba(var(--accent-rgb), 0.1)', tension: 0.4, fill: true, pointRadius: 0 }] },
-                    options: commonOptions
+                    data: { labels: data.labels, datasets: [{ data: data.temperatures, borderColor: '#cc0000', backgroundColor: 'rgba(204, 0, 0, 0.1)', tension: 0.4, fill: true, pointRadius: 0 }] },                    options: commonOptions
                 });
             }
 
