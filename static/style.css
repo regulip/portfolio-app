@@ -1,5 +1,7 @@
 /* --- ALAPOK ÉS HÁTTÉR --- */
 :root {
+    --accent: #cc0000;         /* A fő szín HEX kódja */
+    --accent-rgb: 204, 0, 0;   /* A fő szín RGB kódja az üveges átlátszóságokhoz */
     --glass-bg: rgba(255, 255, 255, 0.7); /* Fehéres, enyhén áttetsző üveg */
     --glass-border: rgba(255, 255, 255, 1);
     --glass-blur: blur(20px);
@@ -250,4 +252,18 @@ button:hover {
     #dynamic-profile-pic {
         margin: 10px auto !important;
     }
+}
+/* Egyedi görgetősáv */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-rgb), 0.5); /* Dinamikus távirányítós szín */
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--accent-rgb), 0.8);
 }

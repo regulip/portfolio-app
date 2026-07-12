@@ -103,7 +103,7 @@ async function fetchPersonalData() {
             let eduHTML = `<h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem;">Tanulmányaim</h2>`;
             data.education.forEach(edu => {
                 eduHTML += `
-                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(204, 0, 0, 0.4);">
+                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(var(--accent-rgb), 0.4);">
                         <h3 style="margin: 0 0 5px 0; color: var(--text-main); font-size: 1.15rem; font-weight: 700;">${edu.institution}</h3>
                         <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.4;">${edu.degree}</p>
                         <p style="color: var(--accent); margin: 0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">${edu.period}</p>
@@ -116,7 +116,7 @@ async function fetchPersonalData() {
             let expHTML = `<h2 style="color: var(--accent); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem;">Munkatapasztalataim</h2>`;
             data.experience.forEach(job => {
                 expHTML += `
-                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(204, 0, 0, 0.4);">
+                    <div style="margin-bottom: 25px; padding-left: 15px; border-left: 2px solid rgba(var(--accent-rgb), 0.4);">
                         <h3 style="margin: 0 0 5px 0; color: var(--text-main); font-size: 1.15rem; font-weight: 700;">${job.company}</h3>
                         <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.4;">${job.role}</p>
                         <p style="color: var(--accent); margin: 0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">${job.period}</p>
@@ -167,13 +167,13 @@ async function fetchPersonalData() {
                             background-size: cover;
                             background-position: center;
                             border: 3px solid var(--accent);
-                            box-shadow: 0 0 25px rgba(204, 0, 0, 0.3);
+                            box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.3);
                             animation: profileMorph 8s ease-in-out infinite;
                             transition: all 0.5s ease;
                         }
                         .morphing-blob-pic:hover {
                             transform: scale(1.05);
-                            box-shadow: 0 0 35px rgba(204, 0, 0, 0.5);
+                            box-shadow: 0 0 35px rgba(var(--accent-rgb), 0.5);
                         }
                         @keyframes profileMorph {
                             0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
@@ -248,7 +248,7 @@ async function fetchGitHubProjects() {
                 html += `
                     <a href="${repo.html_url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 210px;">
                         <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 190px; display: flex; flex-direction: column; justify-content: space-between;"
-                             onmouseover="this.style.background='rgba(204, 0, 0, 0.1)'; this.style.transform='translateY(-10px)';"
+                             onmouseover="this.style.background='rgba(var(--accent-rgb), 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
 
                             <div>
@@ -257,7 +257,7 @@ async function fetchGitHubProjects() {
                                     ${repo.description || 'Nincs megadva leírás ehhez a projekthez.'}
                                 </p>
                             </div>
-                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(204, 0, 0, 0.05);">
+                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(var(--accent-rgb), 0.05);">
                                 ${repo.language || 'Kód'}
                             </span>
                         </div>
@@ -298,7 +298,7 @@ async function fetchGitHubProjects() {
                 html += `
                     <a href="${proj.url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 260px;">
                         <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
-                             onmouseover="this.style.background='rgba(204, 0, 0, 0.1)'; this.style.transform='translateY(-10px)';"
+                             onmouseover="this.style.background='rgba(var(--accent-rgb), 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
                             <div>
                                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
@@ -306,7 +306,7 @@ async function fetchGitHubProjects() {
                                     ${proj.description}
                                 </p>
                             </div>
-                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(204, 0, 0, 0.05);">
+                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(var(--accent-rgb), 0.05);">
                                 ${proj.language}
                             </span>
                         </div>
@@ -353,7 +353,7 @@ async function initIoTModule() {
 
             .iot-btn { cursor: pointer; color: var(--text-main); font-weight: bold; user-select: none; }
             .iot-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.02); }
-            .iot-btn.on { background: rgba(204, 0, 0, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(204, 0, 0, 0.2); }
+            .iot-btn.on { background: rgba(var(--accent-rgb), 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2); }
 
             .weather-cell { box-shadow: inset 0 0 20px rgba(0,0,0,0.1); cursor: default; }
             .weather-icon { font-size: 2.2rem; margin-bottom: 5px; }
@@ -551,7 +551,7 @@ async function fetchAndDrawChart() {
             } else {
                 tempChartInstance = new Chart(ctxTemp, {
                     type: 'line',
-                    data: { labels: data.labels, datasets: [{ data: data.temperatures, borderColor: '#cc0000', backgroundColor: 'rgba(204, 0, 0, 0.1)', tension: 0.4, fill: true, pointRadius: 0 }] },
+                    data: { labels: data.labels, datasets: [{ data: data.temperatures, borderColor: '#cc0000', backgroundColor: 'rgba(var(--accent-rgb), 0.1)', tension: 0.4, fill: true, pointRadius: 0 }] },
                     options: commonOptions
                 });
             }
