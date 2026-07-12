@@ -7,7 +7,6 @@
     --glass-blur: blur(20px);
     --text-main: #2d2d2d;
     --text-muted: #666666;
-    --accent: var(--accent); /* Narancs kiemelés */
 }
 
 body {
@@ -201,7 +200,7 @@ input[type="password"]:focus {
 
 button {
     padding: 12px 30px;
-    background: rgba(204, 0, 0, 0.1);
+    background: rgba(var(--accent-rgb), 0.1);
     border: 1px solid var(--accent);
     color: var(--accent);
     border-radius: 8px;
@@ -214,7 +213,7 @@ button {
 button:hover {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 0 15px rgba(204, 0, 0, 0.4);
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
 }
 
 /* --- KŐKEMÉNY MOBIL OPTIMALIZÁLÁS --- */
