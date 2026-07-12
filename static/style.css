@@ -5,7 +5,7 @@
     --glass-blur: blur(20px);
     --text-main: #2d2d2d;
     --text-muted: #666666;
-    --accent: #ff8c00; /* Narancs kiemelés */
+    --accent: #cc0000; /* Narancs kiemelés */
 }
 
 body {
@@ -38,7 +38,7 @@ body {
     animation: float 20s infinite ease-in-out alternate;
 }
 
-.blob-1 { background: #ff8c00; width: 25vw; height: 25vw; top: 5%; left: 10%; animation-duration: 22s; }
+.blob-1 { background: #cc0000; width: 25vw; height: 25vw; top: 5%; left: 10%; animation-duration: 22s; }
 .blob-2 { background: #ffb732; width: 18vw; height: 18vw; bottom: 15%; right: 20%; animation-duration: 28s; animation-direction: alternate-reverse; animation-delay: -5s; }
 .blob-3 { background: #a0aab5; width: 22vw; height: 22vw; top: 35%; right: 5%; animation-duration: 25s; animation-delay: -12s; }
 .blob-4 { background: #e1e5ea; width: 28vw; height: 28vw; bottom: 5%; left: 25%; animation-duration: 32s; animation-direction: alternate-reverse; animation-delay: -8s; }
@@ -199,7 +199,7 @@ input[type="password"]:focus {
 
 button {
     padding: 12px 30px;
-    background: rgba(255, 140, 0, 0.1);
+    background: rgba(204, 0, 0, 0.1);
     border: 1px solid var(--accent);
     color: var(--accent);
     border-radius: 8px;
@@ -212,7 +212,7 @@ button {
 button:hover {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+    box-shadow: 0 0 15px rgba(204, 0, 0, 0.4);
 }
 
 /* --- KŐKEMÉNY MOBIL OPTIMALIZÁLÁS --- */

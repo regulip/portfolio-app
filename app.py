@@ -128,8 +128,8 @@ def background_logger():
             except Exception as e:
                 print(f"[Hiba] A hőmérséklet lekérése/mentése sikertelen: {e}")
 
-        # 15 percenként mér (900 mp)
-        time.sleep(900)
+        #30 percenként mér (1800 mp)
+        time.sleep(1800)
 
 init_db()
 threading.Thread(target=background_logger, daemon=True).start()
