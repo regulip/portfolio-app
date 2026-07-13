@@ -312,24 +312,36 @@ async function fetchGitHubProjects() {
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
                             ${devBadge}
                             <div style="padding-right: ${proj.isDeveloping ? '80px' : '0'};">
-                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1
-
-                        html += `
-                                </div>
-                                <button class="slider-btn" onclick="document.getElementById('other-repo-container').scrollBy({left: 300, behavior: 'smooth'})"
-                                        style="position: absolute; right: -25px; z-index: 10; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: black; font-size: 2.5rem; cursor: pointer; transition: all 0.3s ease; padding: 0;"
-                                        onmouseover="this.style.color='var(--accent)'; this.style.transform='scale(1.2)';"
-                                        onmouseout="this.style.color='black'; this.style.transform='scale(1)';">
-                                    &#10095;
-                                </button>
+                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
                             </div>
-                        `;
-                        projectsCard.innerHTML = html;
-                    }
-                } catch (error) {
-                    console.error('Hiba a projektek betöltésekor:', error);
+                            <p style="margin: 0 0 auto 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+                                ${proj.description}
+                            </p>
+                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(var(--accent-rgb), 0.05);">
+                                ${proj.language}
+                            </span>
+                        </div>
+                    </a>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <button class="slider-btn" onclick="document.getElementById('other-repo-container').scrollBy({left: 300, behavior: 'smooth'})"
+                            style="position: absolute; right: -25px; z-index: 10; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: black; font-size: 2.5rem; cursor: pointer; transition: all 0.3s ease; padding: 0;"
+                            onmouseover="this.style.color='var(--accent)'; this.style.transform='scale(1.2)';"
+                            onmouseout="this.style.color='black'; this.style.transform='scale(1)';">
+                        &#10095;
+                    </button>
+                </div>
+            `;
+
+                    projectsCard.innerHTML = html;
                 }
+            } catch (error) {
+                console.error('Hiba a projektek betöltésekor:', error);
             }
+        }
 
 
 // --- 3. MODUL: IOT ÉS OKOSOTTHON INTEGRÁCIÓ ---
