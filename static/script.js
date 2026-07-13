@@ -123,6 +123,12 @@ async function fetchPersonalData() {
                     </div>
                 `;
             });
+            expHTML += `
+                <div style="margin-top: -15px; margin-bottom: 25px; padding-left: 15px; border-left: 2px dashed rgba(var(--accent-rgb), 0.2); padding-top: 5px; padding-bottom: 5px;">
+                    <span style="color: rgba(var(--accent-rgb), 0.6); font-size: 1.5rem; font-weight: bold; letter-spacing: 4px; line-height: 1;">...</span>
+                </div>
+            `;
+
             document.getElementById('experience').innerHTML = expHTML;
 
             // 4. KÉSZSÉGEK & HOBBIK
@@ -277,9 +283,10 @@ async function fetchGitHubProjects() {
             `;
 
             const otherProjects = [
-                { name: "Mozi Jegyfoglaló Webapp", description: "Egyetemi projekt: teljes körű mozijegy-foglaló rendszer terminálos és grafikus felülettel, adatbázissal.", language: "Python / Flask", url: "#" },
-                { name: "Étrend-kiegészítő Webáruház", description: "Shopify alapú e-commerce platform üzleti koncepciója, logisztikai rendszer integrációval.", language: "Shopify / E-commerce", url: "#" },
-                { name: "IoT Okosotthon Dashboard", description: "Egyedi okosotthon vezérlőfelület, amely közvetlenül kommunikál a Tuya API-val és a szenzorokkal.", language: "JavaScript / IoT", url: "#" }
+                { name: "Mozi Jegyfoglaló Webapp", description: "Egyetemi projekt: teljes körű mozijegy-foglaló rendszer terminálos és grafikus felülettel, adatbázissal.", language: "Node.js / SQLite", url: "#", isDeveloping: false },
+                { name: "Étrend-kiegészítő Webáruház", description: "Shopify alapú e-commerce platform üzleti koncepciója, logisztikai rendszer integrációval.", language: "Shopify / E-commerce", url: "#", isDeveloping: true },
+                { name: "IoT Okosotthon Dashboard", description: "Egyedi okosotthon vezérlőfelület, amely közvetlenül kommunikál a Tuya API-val és a szenzorokkal.", language: "JavaScript / IoT", url: "#", isDeveloping: true },
+                { name: "AI Könyvfordító Alkalmazás", description: "Mesterséges intelligenciára épülő szoftver komplett könyvek és dokumentumok automatizált, kontextus-tudatos fordítására.", language: "Python / AI", url: "#", isDeveloping: true }
             ];
 
             html += `
@@ -295,41 +302,34 @@ async function fetchGitHubProjects() {
             `;
 
             otherProjects.forEach(proj => {
+                // A "kapcsoló" vizuális része: ha true, beteszi a címkét, ha false, üres marad
+                const devBadge = proj.isDeveloping ? `<span style="position: absolute; top: 15px; right: 15px; font-size: 0.65rem; color: #ffb732; border: 1px solid #ffb732; padding: 4px 8px; border-radius: 10px; background: rgba(255, 183, 50, 0.1); text-transform: uppercase; font-weight: bold; box-shadow: 0 0 10px rgba(255, 183, 50, 0.2);">Fejlesztés alatt</span>` : '';
+
                 html += `
                     <a href="${proj.url}" target="_blank" style="text-decoration: none; color: inherit; flex: 0 0 260px;">
-                        <div style="background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
+                        <div style="position: relative; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; transition: transform 0.3s ease, background 0.3s ease; height: 220px; display: flex; flex-direction: column; justify-content: space-between;"
                              onmouseover="this.style.background='rgba(var(--accent-rgb), 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
-                            <div>
-                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
-                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
-                                    ${proj.description}
-                                </p>
-                            </div>
-                            <span style="display: inline-block; margin-top: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 12px; align-self: flex-start; background: rgba(var(--accent-rgb), 0.05);">
-                                ${proj.language}
-                            </span>
-                        </div>
-                    </a>
-                `;
-            });
+                            ${devBadge}
+                            <div style="padding-right: ${proj.isDeveloping ? '80px' : '0'};">
+                                <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1
 
-            html += `
-                    </div>
-                    <button class="slider-btn" onclick="document.getElementById('other-repo-container').scrollBy({left: 300, behavior: 'smooth'})"
-                            style="position: absolute; right: -25px; z-index: 10; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: black; font-size: 2.5rem; cursor: pointer; transition: all 0.3s ease; padding: 0;"
-                            onmouseover="this.style.color='var(--accent)'; this.style.transform='scale(1.2)';"
-                            onmouseout="this.style.color='black'; this.style.transform='scale(1)';">
-                        &#10095;
-                    </button>
-                </div>
-            `;
-            projectsCard.innerHTML = html;
-        }
-    } catch (error) {
-        console.error('Hiba a projektek betöltésekor:', error);
-    }
-}
+                        html += `
+                                </div>
+                                <button class="slider-btn" onclick="document.getElementById('other-repo-container').scrollBy({left: 300, behavior: 'smooth'})"
+                                        style="position: absolute; right: -25px; z-index: 10; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; color: black; font-size: 2.5rem; cursor: pointer; transition: all 0.3s ease; padding: 0;"
+                                        onmouseover="this.style.color='var(--accent)'; this.style.transform='scale(1.2)';"
+                                        onmouseout="this.style.color='black'; this.style.transform='scale(1)';">
+                                    &#10095;
+                                </button>
+                            </div>
+                        `;
+                        projectsCard.innerHTML = html;
+                    }
+                } catch (error) {
+                    console.error('Hiba a projektek betöltésekor:', error);
+                }
+            }
 
 
 // --- 3. MODUL: IOT ÉS OKOSOTTHON INTEGRÁCIÓ ---
