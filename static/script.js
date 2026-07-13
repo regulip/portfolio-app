@@ -311,7 +311,7 @@ async function fetchGitHubProjects() {
                              onmouseover="this.style.background='rgba(var(--accent-rgb), 0.1)'; this.style.transform='translateY(-10px)';"
                              onmouseout="this.style.background='rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(0)';">
                             ${devBadge}
-                            <div style="padding-right: ${proj.isDeveloping ? '80px' : '0'};">
+                            <div style="padding-right: ${proj.isDeveloping ? '130px' : '0'};">
                                 <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${proj.name}</h3>
                             </div>
                             <p style="margin: 0 0 auto 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
